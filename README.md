@@ -1,7 +1,7 @@
 # Delivery System - CR2
 
 ## Equipe
-- **Ándre Tavares**
+- **Andre Tavares**
 - **Bruno Peres**
 - **Sahuan Pimentel**
 
@@ -20,4 +20,4 @@ Este projeto é um sistema de entrega de pedidos (Delivery) com um módulo indep
    mvn exec:java -pl DeliveryPedido
 
 ## Link do Reposit�rio
-- **Git Clone:** git clone <link-do-repositorio-aqui>
+- **Git Clone:** git clone https://github.com/BrunoPer3s/Delivery-System.git
