@@ -6,7 +6,6 @@
 log.*
 *.jsonl
 *.csv
-*.xml
 
 # Maven
 target/
