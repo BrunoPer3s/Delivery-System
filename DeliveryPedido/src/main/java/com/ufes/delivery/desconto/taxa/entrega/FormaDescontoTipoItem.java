@@ -15,7 +15,9 @@ public class FormaDescontoTipoItem implements IFormaDescontoTaxaEntrega {
     public FormaDescontoTipoItem() {
         descontosPorTipoItem = new HashMap<>();
 
+        descontosPorTipoItem.put("Alimentação", 5.00);
         descontosPorTipoItem.put("Alimentacao", 5.00);
+        descontosPorTipoItem.put("Educação", 2.00);
         descontosPorTipoItem.put("Educacao", 2.00);
         descontosPorTipoItem.put("Lazer", 1.50);
     }
@@ -56,3 +58,4 @@ public class FormaDescontoTipoItem implements IFormaDescontoTaxaEntrega {
         return Optional.ofNullable(descontosPorTipoItem.get(item.getTipo()));
     }
 }
+

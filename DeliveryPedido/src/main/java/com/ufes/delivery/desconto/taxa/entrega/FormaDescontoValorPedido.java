@@ -22,3 +22,4 @@ public class FormaDescontoValorPedido implements IFormaDescontoTaxaEntrega {
         return pedido.getValorPedido() > LIMITE_VALOR_PEDIDO;
     }
 }
+

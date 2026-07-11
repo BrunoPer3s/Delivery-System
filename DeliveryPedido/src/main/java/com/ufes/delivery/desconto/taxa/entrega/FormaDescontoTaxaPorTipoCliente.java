@@ -33,3 +33,4 @@ public class FormaDescontoTaxaPorTipoCliente implements IFormaDescontoTaxaEntreg
         return Optional.ofNullable(descontosPorTipoCliente.get(pedido.getCliente().getTipo()));
     }
 }
+

@@ -8,3 +8,4 @@ public interface IFormaDescontoTaxaEntrega {
 
     boolean seAplica(Pedido pedido);
 }
+

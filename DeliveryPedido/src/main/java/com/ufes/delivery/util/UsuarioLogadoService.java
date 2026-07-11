@@ -1,18 +1,15 @@
 package com.ufes.delivery.util;
 
-import java.util.Random;
+import com.ufes.delivery.service.SessaoService;
 
 public class UsuarioLogadoService {
-    private static final Random geradorAleatorio = new Random();
 
-    public static String getNomeUsuario() {  
-        int valor = geradorAleatorio.nextInt(100);  
-        if (valor < 33) {  
-            return "Balcão PDV 1";  
-        } else if (valor < 66) {  
-            return "Gerente";  
-        } else {  
-            return "Fulano de tal";  
-        }  
-    }  
+    private UsuarioLogadoService() {
+    }
+
+    public static String getNomeUsuario() {
+        String usuario = SessaoService.getInstancia().getNomeUsuarioLogado();
+        return usuario != null ? usuario : "sistema";
+    }
 }
+

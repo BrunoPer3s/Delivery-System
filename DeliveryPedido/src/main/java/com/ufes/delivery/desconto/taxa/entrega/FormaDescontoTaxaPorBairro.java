@@ -32,3 +32,4 @@ public class FormaDescontoTaxaPorBairro implements IFormaDescontoTaxaEntrega {
         return Optional.ofNullable(descontoBairro.get(pedido.getCliente().getBairro()));
     }
 }
+

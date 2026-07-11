@@ -80,3 +80,4 @@ public class UmCasoDeUsoDePedido {
         System.out.println("\n>>> EXECUCAO FINALIZADA. Verifique os arquivos log.jsonl, log.csv e log.xml na raiz do projeto.");
     }
 }
+

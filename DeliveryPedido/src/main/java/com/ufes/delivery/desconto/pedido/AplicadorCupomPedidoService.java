@@ -49,9 +49,10 @@ public class AplicadorCupomPedidoService {
         }
 
         pedido.setCupomAplicado(cupom);
-        
+
         if (logger != null) {
             logger.registrar(MensagemLogFactory.criar(pedido, "Aplicação de cupom de desconto no valor total do pedido", "aplicarCupom"));
         }
     }
 }
+

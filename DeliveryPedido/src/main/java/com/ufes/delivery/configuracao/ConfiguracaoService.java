@@ -10,3 +10,4 @@ public final class ConfiguracaoService {
         return TAXA_ENTREGA_PADRAO;
     }
 }
+

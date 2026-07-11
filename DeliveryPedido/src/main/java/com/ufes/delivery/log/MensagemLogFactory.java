@@ -12,7 +12,7 @@ public class MensagemLogFactory {
 
     public static MensagemLog criar(Pedido pedido, String descricaoOperacao, String nomeMetodo) {
         LocalDateTime agora = LocalDateTime.now();
-        
+
         String nomeUsuario = UsuarioLogadoService.getNomeUsuario();
         String data = agora.format(dateFormatter);
         String hora = agora.format(timeFormatter);
@@ -29,5 +29,21 @@ public class MensagemLogFactory {
             nomeCliente
         );
     }
+
+    public static MensagemLog criarParaOperacao(String nomeUsuario, String descricaoOperacao) {
+        LocalDateTime agora = LocalDateTime.now();
+        String data = agora.format(dateFormatter);
+        String hora = agora.format(timeFormatter);
+
+        return new MensagemLog(
+            nomeUsuario,
+            data,
+            hora,
+            "",
+            descricaoOperacao,
+            ""
+        );
+    }
 }
+
 

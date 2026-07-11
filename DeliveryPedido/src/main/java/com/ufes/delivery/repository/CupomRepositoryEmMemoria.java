@@ -12,22 +12,15 @@ public class CupomRepositoryEmMemoria implements ICupomRepository {
     private Map<String, CupomDescontoPedido> cuponsDisponiveis = new HashMap<>();
 
     public CupomRepositoryEmMemoria() {
-        cuponsDisponiveis.put("DESC10", new CupomDescontoPedido("DESC10", 10.0, LocalDateTime.of(2026, 4, 25, 0, 0),
-                LocalDateTime.of(2026, 4, 27, 23, 59)));
-        cuponsDisponiveis.put("DESC20", new CupomDescontoPedido("DESC20", 20.0, LocalDateTime.of(2026, 5, 1, 0, 0),
-                LocalDateTime.of(2026, 5, 5, 23, 59)));
-        cuponsDisponiveis.put("DESC30", new CupomDescontoPedido("DESC30", 30.0, LocalDateTime.of(2026, 4, 24, 0, 0),
-                LocalDateTime.of(2026, 4, 24, 23, 59)));
-        cuponsDisponiveis.put("DIAPAI12", new CupomDescontoPedido("DIAPAI12", 12.0, LocalDateTime.of(2026, 5, 9, 0, 0),
-                LocalDateTime.of(2026, 5, 10, 23, 59)));
-        cuponsDisponiveis.put("DIAMAE12", new CupomDescontoPedido("DIAMAE12", 12.0, LocalDateTime.of(2026, 5, 10, 0, 0),
-                LocalDateTime.of(2026, 5, 12, 23, 59)));
-        cuponsDisponiveis.put("NATAL10", new CupomDescontoPedido("NATAL10", 10.0, LocalDateTime.of(2026, 4, 20, 0, 0),
-                LocalDateTime.of(2026, 4, 26, 23, 59)));
-        cuponsDisponiveis.put("FESTA15", new CupomDescontoPedido("FESTA15", 15.0, LocalDateTime.of(2026, 4, 30, 18, 0),
-                LocalDateTime.of(2026, 5, 1, 6, 0)));
-        cuponsDisponiveis.put("BLACK50", new CupomDescontoPedido("BLACK50", 50.0, LocalDateTime.of(2026, 4, 28, 0, 0),
-                LocalDateTime.of(2026, 4, 28, 23, 59)));
+        cuponsDisponiveis.put("EDUCAR10", new CupomDescontoPedido("EDUCAR10", 10.0,
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2026, 12, 31, 23, 59)));
+        cuponsDisponiveis.put("DESC20", new CupomDescontoPedido("DESC20", 20.0,
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2026, 12, 31, 23, 59)));
+        cuponsDisponiveis.put("NATAL15", new CupomDescontoPedido("NATAL15", 15.0,
+                LocalDateTime.of(2026, 12, 1, 0, 0),
+                LocalDateTime.of(2026, 12, 31, 23, 59)));
     }
 
     public void adicionarCupom(CupomDescontoPedido cupom) {
@@ -113,3 +106,4 @@ public class CupomRepositoryEmMemoria implements ICupomRepository {
         return Map.copyOf(cuponsDisponiveis);
     }
 }
+
