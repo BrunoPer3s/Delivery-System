@@ -7,6 +7,8 @@ import com.ufes.delivery.repository.cliente.ClienteRepositorySQLite;
 import com.ufes.delivery.repository.cupom.CupomRepositorySQLite;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
+import com.ufes.delivery.repository.pagamento.ConfirmacaoPagamentoRepositorySQLite;
+import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
@@ -38,9 +40,13 @@ public class DeliveryApplication {
 
             IUsuarioRepository usuarioRepository = new UsuarioRepositorySQLite(banco);
             IClienteRepository clienteRepository = new ClienteRepositorySQLite(banco);
-            IProdutoRepository produtoRepository = new ProdutoRepositorySQLite(banco);
+            ProdutoRepositorySQLite produtoRepository = new ProdutoRepositorySQLite(banco);
             ICupomRepository cupomRepository = new CupomRepositorySQLite(banco);
-            IPedidoRepository pedidoRepository = new PedidoRepositorySQLite(banco);
+            PedidoRepositorySQLite pedidoRepository = new PedidoRepositorySQLite(banco);
+
+            IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository =
+                    new ConfirmacaoPagamentoRepositorySQLite(
+                            banco, produtoRepository, pedidoRepository);
 
             AutenticacaoService autenticacaoService =
                     new AutenticacaoService(usuarioRepository, logger);
@@ -54,7 +60,8 @@ public class DeliveryApplication {
             LoginPresenter loginPresenter = new LoginPresenter(
                     loginView, autenticacaoService, sessaoService,
                     usuarioRepository, clienteRepository, produtoRepository,
-                    cupomRepository, pedidoRepository, logger);
+                    cupomRepository, pedidoRepository, confirmacaoPagamentoRepository,
+                    logger);
             loginView.setPresenter(loginPresenter);
 
             loginView.exibir();

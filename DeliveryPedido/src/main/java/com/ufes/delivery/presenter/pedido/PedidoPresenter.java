@@ -15,6 +15,7 @@ import com.ufes.delivery.model.Produto;
 import com.ufes.delivery.model.estado.EstadosPedido;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
+import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.pedido.PedidoRegistro;
@@ -30,8 +31,10 @@ import com.ufes.delivery.view.pedido.ResultadoPagamentoView;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 public class PedidoPresenter {
@@ -41,6 +44,7 @@ public class PedidoPresenter {
     private final IProdutoRepository produtoRepository;
     private final ICupomRepository cupomRepository;
     private final IPedidoRepository pedidoRepository;
+    private final IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository;
     private final GerenciadorDeLogAtivo logger;
     private final SessaoService sessaoService;
     private final IFonteAleatoriedade fonteAleatoriedade;
@@ -58,10 +62,12 @@ public class PedidoPresenter {
                            IProdutoRepository produtoRepository,
                            ICupomRepository cupomRepository,
                            IPedidoRepository pedidoRepository,
+                           IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository,
                            GerenciadorDeLogAtivo logger,
                            SessaoService sessaoService) {
         this(view, clienteRepository, produtoRepository, cupomRepository, pedidoRepository,
-                logger, sessaoService, new FonteAleatoriedadePadrao());
+                confirmacaoPagamentoRepository, logger, sessaoService,
+                new FonteAleatoriedadePadrao());
     }
 
     public PedidoPresenter(IPedidoView view,
@@ -69,6 +75,7 @@ public class PedidoPresenter {
                            IProdutoRepository produtoRepository,
                            ICupomRepository cupomRepository,
                            IPedidoRepository pedidoRepository,
+                           IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository,
                            GerenciadorDeLogAtivo logger,
                            SessaoService sessaoService,
                            IFonteAleatoriedade fonteAleatoriedade) {
@@ -77,6 +84,7 @@ public class PedidoPresenter {
         this.produtoRepository = produtoRepository;
         this.cupomRepository = cupomRepository;
         this.pedidoRepository = pedidoRepository;
+        this.confirmacaoPagamentoRepository = confirmacaoPagamentoRepository;
         this.logger = logger;
         this.sessaoService = sessaoService;
         this.fonteAleatoriedade = fonteAleatoriedade;
@@ -338,19 +346,38 @@ public class PedidoPresenter {
             return;
         }
 
+        Map<Integer, Integer> quantidadeSolicitada = new LinkedHashMap<>();
         for (int i = 0; i < itensDoCarrinho.size(); i++) {
-            Item item = itensDoCarrinho.get(i);
-            Produto produto = produtosAdicionados.get(i);
-            if (item.getQuantidade() > produto.getEstoqueAtual()) {
+            quantidadeSolicitada.merge(produtosAdicionados.get(i).getCodigo(),
+                    itensDoCarrinho.get(i).getQuantidade(), Integer::sum);
+        }
+
+        List<Produto> produtosDoPedido = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entrada : quantidadeSolicitada.entrySet()) {
+            int codigoProduto = entrada.getKey();
+            int solicitado = entrada.getValue();
+
+            Optional<Produto> produtoAtual = produtoRepository.buscarPorCodigo(codigoProduto);
+            if (produtoAtual.isEmpty()) {
+                view.exibirMensagemErro("Produto de código " + codigoProduto
+                        + " não está mais cadastrado. Remova o item e tente novamente.");
+                registrarAuditoria("Pagamento bloqueado - produto inexistente - Pedido #"
+                        + pedido.getCodigo() + " - Produto: " + codigoProduto);
+                return;
+            }
+
+            Produto produto = produtoAtual.get();
+            if (solicitado > produto.getEstoqueAtual()) {
                 view.exibirMensagemErro("Estoque insuficiente para \"" + produto.getNome()
-                        + "\". Solicitado: " + item.getQuantidade()
+                        + "\". Solicitado: " + solicitado
                         + ", disponível: " + produto.getEstoqueAtual() + ".");
                 registrarAuditoria("Pagamento bloqueado por estoque insuficiente - Pedido #"
                         + pedido.getCodigo() + " - Produto: " + produto.getNome()
-                        + " - Solicitado: " + item.getQuantidade()
+                        + " - Solicitado: " + solicitado
                         + " - Disponível: " + produto.getEstoqueAtual());
                 return;
             }
+            produtosDoPedido.add(produto);
         }
 
         SimuladorPagamentoService simulador = new SimuladorPagamentoService(fonteAleatoriedade);
@@ -366,15 +393,8 @@ public class PedidoPresenter {
         String totalFormatado = FORMATO_MOEDA.format(pedido.calcularValorTotal());
 
         if (resultado.isAprovado()) {
-            for (int i = 0; i < itensDoCarrinho.size(); i++) {
-                Item item = itensDoCarrinho.get(i);
-                Produto produto = produtosAdicionados.get(i);
-                produto.ajustarEstoque(-item.getQuantidade());
-                produtoRepository.salvar(produto);
-                registrarAuditoria("Baixa de estoque - Pedido #" + pedido.getCodigo()
-                        + " - Produto: " + produto.getCodigo() + " - " + produto.getNome()
-                        + " - Qtd: " + item.getQuantidade()
-                        + " - Estoque resultante: " + produto.getEstoqueAtual());
+            for (Produto produto : produtosDoPedido) {
+                produto.ajustarEstoque(-quantidadeSolicitada.get(produto.getCodigo()));
             }
 
             String dataPedidoStr = resultado.getDataHoraPagamento()
@@ -386,7 +406,23 @@ public class PedidoPresenter {
                     null,
                     EstadosPedido.AGUARDANDO_ENTREGA,
                     totalFormatado);
-            pedidoRepository.registrar(registro);
+
+            try {
+                confirmacaoPagamentoRepository.confirmar(produtosDoPedido, registro);
+            } catch (RuntimeException e) {
+                view.exibirMensagemErro(
+                        "Falha ao confirmar o pagamento. Nenhuma alteração foi persistida.");
+                registrarAuditoria("Falha na confirmação do pagamento - Pedido #"
+                        + pedido.getCodigo() + " - " + e.getMessage());
+                return;
+            }
+
+            for (Produto produto : produtosDoPedido) {
+                registrarAuditoria("Baixa de estoque - Pedido #" + pedido.getCodigo()
+                        + " - Produto: " + produto.getCodigo() + " - " + produto.getNome()
+                        + " - Qtd: " + quantidadeSolicitada.get(produto.getCodigo())
+                        + " - Estoque resultante: " + produto.getEstoqueAtual());
+            }
 
             registrarAuditoria("Pedido #" + pedido.getCodigo() + " APROVADO via "
                     + resultado.getFormaPagamento() + " - Cliente: "

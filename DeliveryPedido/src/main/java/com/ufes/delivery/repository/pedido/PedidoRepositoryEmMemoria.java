@@ -7,6 +7,7 @@ import com.ufes.delivery.model.estado.EstadoPedido;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class PedidoRepositoryEmMemoria implements IPedidoRepository {
@@ -39,10 +40,22 @@ public class PedidoRepositoryEmMemoria implements IPedidoRepository {
     }
 
     @Override
-    public int contarPorEstado(EstadoPedido estado) {
+    public List<PedidoRegistro> listarPorData(String dataOperacao) {
+        List<PedidoRegistro> resultado = new ArrayList<>();
+        for (PedidoRegistro p : pedidos) {
+            if (Objects.equals(p.getDataPedido(), dataOperacao)) {
+                resultado.add(p);
+            }
+        }
+        return resultado;
+    }
+
+    @Override
+    public int contarPorEstadoNaData(EstadoPedido estado, String dataOperacao) {
         int count = 0;
         for (PedidoRegistro p : pedidos) {
-            if (p.getEstado().equals(estado)) {
+            if (p.getEstado().equals(estado)
+                    && Objects.equals(p.getDataPedido(), dataOperacao)) {
                 count++;
             }
         }
@@ -50,8 +63,20 @@ public class PedidoRepositoryEmMemoria implements IPedidoRepository {
     }
 
     @Override
-    public int total() {
-        return pedidos.size();
+    public int contarEntreguesNaData(String dataOperacao) {
+        int count = 0;
+        for (PedidoRegistro p : pedidos) {
+            if (p.getDataConclusao() != null
+                    && Objects.equals(p.getDataConclusao(), dataOperacao)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public int totalNaData(String dataOperacao) {
+        return listarPorData(dataOperacao).size();
     }
 
     @Override

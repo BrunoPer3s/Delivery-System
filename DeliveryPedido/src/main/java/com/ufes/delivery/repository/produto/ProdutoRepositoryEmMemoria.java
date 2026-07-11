@@ -64,6 +64,22 @@ public class ProdutoRepositoryEmMemoria implements IProdutoRepository {
     }
 
     @Override
+    public void salvarEmLote(List<Produto> lote) {
+        if (lote == null) {
+            throw new IllegalArgumentException("Lote de produtos não pode ser nulo");
+        }
+        for (Produto produto : lote) {
+            if (produto == null) {
+                throw new IllegalArgumentException("Produto não pode ser nulo");
+            }
+        }
+        for (Produto produto : lote) {
+            produtos.put(produto.getCodigo(), produto);
+        }
+        notificarObservadores();
+    }
+
+    @Override
     public List<Produto> listarTodos() {
         return new ArrayList<>(produtos.values());
     }

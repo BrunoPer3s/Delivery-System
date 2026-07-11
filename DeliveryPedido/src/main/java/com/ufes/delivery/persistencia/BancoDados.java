@@ -32,6 +32,23 @@ public class BancoDados {
         }
     }
 
+    public void executarEmTransacao(TransacaoBanco transacao) {
+        try (Connection conexao = abrirConexao()) {
+            conexao.setAutoCommit(false);
+            try {
+                transacao.executar(conexao);
+                conexao.commit();
+            } catch (SQLException e) {
+                conexao.rollback();
+                throw e;
+            } finally {
+                conexao.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new PersistenciaException("Falha ao executar transacao", e);
+        }
+    }
+
     public void inicializar() {
         try (Connection conexao = abrirConexao();
              Statement stmt = conexao.createStatement()) {

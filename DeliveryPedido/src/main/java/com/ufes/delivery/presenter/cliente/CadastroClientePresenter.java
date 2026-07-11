@@ -142,6 +142,12 @@ public class CadastroClientePresenter {
             return;
         }
 
+        if (enderecos.size() > Cliente.MAX_ENDERECOS) {
+            view.exibirMensagemErro("Um cliente pode ter no máximo "
+                    + Cliente.MAX_ENDERECOS + " endereços de entrega.");
+            return;
+        }
+
         boolean temPadrao = enderecos.stream().anyMatch(Endereco::isPadrao);
         if (!temPadrao) {
             view.exibirMensagemErro("Um endereço padrão é obrigatório.");
@@ -170,7 +176,7 @@ public class CadastroClientePresenter {
             view.exibirMensagemSucesso("Cliente salvo com sucesso!");
             view.fechar();
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             view.exibirMensagemErro(e.getMessage());
         }
     }

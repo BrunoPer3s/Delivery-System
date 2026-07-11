@@ -17,6 +17,8 @@ public interface IProdutoRepository {
 
     void salvar(Produto produto);
 
+    void salvarEmLote(List<Produto> produtos);
+
     List<Produto> listarTodos();
 
 

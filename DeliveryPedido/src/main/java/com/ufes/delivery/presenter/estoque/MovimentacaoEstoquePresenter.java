@@ -171,6 +171,13 @@ public class MovimentacaoEstoquePresenter {
 
         boolean isAjuste = "Ajuste de estoque".equals(tipo);
 
+        if (!isAjuste && quantidade < 0) {
+            view.exibirMensagemErro(
+                "Quantidade de uma Entrada deve ser positiva. "
+                + "Para reduzir o estoque, selecione Ajuste de estoque.");
+            return;
+        }
+
         String motivo = view.getMotivoAjuste();
         if (isAjuste && (motivo == null || motivo.trim().isEmpty())) {
             view.exibirMensagemErro("Motivo do ajuste é obrigatório.");

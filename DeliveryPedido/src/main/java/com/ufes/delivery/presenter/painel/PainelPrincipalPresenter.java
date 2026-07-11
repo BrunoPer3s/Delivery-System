@@ -9,6 +9,8 @@ import com.ufes.delivery.presenter.estoque.MovimentacaoEstoquePresenter;
 import com.ufes.delivery.presenter.pedido.PedidoPresenter;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.model.Sessao;
 import com.ufes.delivery.model.estado.EstadosPedido;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
@@ -42,6 +44,7 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
     private final IProdutoRepository produtoRepository;
     private final ICupomRepository cupomRepository;
     private final IPedidoRepository pedidoRepository;
+    private final IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository;
     private final SessaoService sessaoService;
     private final GerenciadorDeLogAtivo logger;
 
@@ -54,6 +57,7 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
                                      IProdutoRepository produtoRepository,
                                      ICupomRepository cupomRepository,
                                      IPedidoRepository pedidoRepository,
+                                     IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository,
                                      SessaoService sessaoService,
                                      GerenciadorDeLogAtivo logger) {
         this.view = view;
@@ -62,6 +66,7 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
         this.produtoRepository = produtoRepository;
         this.cupomRepository = cupomRepository;
         this.pedidoRepository = pedidoRepository;
+        this.confirmacaoPagamentoRepository = confirmacaoPagamentoRepository;
         this.sessaoService = sessaoService;
         this.logger = logger;
 
@@ -76,7 +81,7 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
     }
 
     private void configurarPainel() {
-        view.setDataOperacao(LocalDate.now().format(DATE_FORMATTER));
+        view.setDataOperacao(getDataOperacao());
 
         Sessao sessao = sessaoService.getSessaoAtual();
         if (sessao != null) {
@@ -93,7 +98,9 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
     }
 
     public void atualizarPedidosEMetricas() {
-        List<PedidoRegistro> pedidos = pedidoRepository.listarTodos();
+        String dataOperacao = getDataOperacao();
+
+        List<PedidoRegistro> pedidos = pedidoRepository.listarPorData(dataOperacao);
 
         List<String[]> dadosTabela = new ArrayList<>();
         for (PedidoRegistro p : pedidos) {
@@ -101,16 +108,24 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
         }
         view.carregarPedidos(dadosTabela);
 
-        int total = pedidoRepository.total();
-        int novos = pedidoRepository.contarPorEstado(EstadosPedido.NOVO);
-        int aguardandoPagamento = pedidoRepository.contarPorEstado(EstadosPedido.AGUARDANDO_PAGAMENTO);
-        int emPreparo = pedidoRepository.contarPorEstado(EstadosPedido.EM_PREPARO);
-        int aguardandoEntrega = pedidoRepository.contarPorEstado(EstadosPedido.AGUARDANDO_ENTREGA);
-        int emTransito = pedidoRepository.contarPorEstado(EstadosPedido.EM_TRANSITO);
-        int entregues = pedidoRepository.contarPorEstado(EstadosPedido.ENTREGUE);
+        int total = pedidoRepository.totalNaData(dataOperacao);
+        int novos = pedidoRepository.contarPorEstadoNaData(EstadosPedido.NOVO, dataOperacao);
+        int aguardandoPagamento = pedidoRepository.contarPorEstadoNaData(
+                EstadosPedido.AGUARDANDO_PAGAMENTO, dataOperacao);
+        int emPreparo = pedidoRepository.contarPorEstadoNaData(
+                EstadosPedido.EM_PREPARO, dataOperacao);
+        int aguardandoEntrega = pedidoRepository.contarPorEstadoNaData(
+                EstadosPedido.AGUARDANDO_ENTREGA, dataOperacao);
+        int emTransito = pedidoRepository.contarPorEstadoNaData(
+                EstadosPedido.EM_TRANSITO, dataOperacao);
+        int entregues = pedidoRepository.contarEntreguesNaData(dataOperacao);
 
         view.setMetricas(total, novos, aguardandoPagamento, emPreparo,
                 aguardandoEntrega, emTransito, entregues);
+    }
+
+    private String getDataOperacao() {
+        return LocalDate.now().format(DATE_FORMATTER);
     }
 
     public void onVisualizarPedido(int codigo) {
@@ -131,7 +146,8 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
         PedidoView pedidoView = new PedidoView();
         PedidoPresenter pedidoPresenter = new PedidoPresenter(
                 pedidoView, clienteRepository, produtoRepository,
-                cupomRepository, pedidoRepository, logger, sessaoService);
+                cupomRepository, pedidoRepository, confirmacaoPagamentoRepository,
+                logger, sessaoService);
         pedidoView.setPresenter(pedidoPresenter);
 
         pedidoView.exibir();
@@ -179,11 +195,31 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
 
 
     public void onGestaoUsuarios() {
+        if (!sessaoService.isAdministrador()) {
+            view.exibirMensagemErro(
+                    "Gestão de usuários é restrita ao perfil Administrador.");
+            registrarAuditoria(
+                    "Acesso negado - tentativa de abrir gestão de usuários sem perfil Administrador");
+            return;
+        }
+
         GestaoUsuarioView gestaoView = new GestaoUsuarioView();
         GestaoUsuarioPresenter gestaoPresenter = new GestaoUsuarioPresenter(
                 gestaoView, usuarioRepository, sessaoService, logger);
         gestaoView.setPresenter(gestaoPresenter);
         gestaoView.exibir();
+    }
+
+    private void registrarAuditoria(String operacao) {
+        if (logger != null) {
+            try {
+                String usuario = sessaoService.getNomeUsuarioLogado();
+                logger.registrar(MensagemLogFactory.criarParaOperacao(
+                        usuario != null ? usuario : "sistema", operacao));
+            } catch (Exception e) {
+                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+            }
+        }
     }
 }
 

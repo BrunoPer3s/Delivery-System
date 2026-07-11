@@ -7,6 +7,7 @@ import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.model.Sessao;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
+import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
@@ -27,6 +28,7 @@ public class LoginPresenter {
     private final IProdutoRepository produtoRepository;
     private final ICupomRepository cupomRepository;
     private final IPedidoRepository pedidoRepository;
+    private final IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository;
     private final GerenciadorDeLogAtivo logger;
 
     public LoginPresenter(ILoginView view,
@@ -37,6 +39,7 @@ public class LoginPresenter {
                           IProdutoRepository produtoRepository,
                           ICupomRepository cupomRepository,
                           IPedidoRepository pedidoRepository,
+                          IConfirmacaoPagamentoRepository confirmacaoPagamentoRepository,
                           GerenciadorDeLogAtivo logger) {
         this.view = view;
         this.autenticacaoService = autenticacaoService;
@@ -46,6 +49,7 @@ public class LoginPresenter {
         this.produtoRepository = produtoRepository;
         this.cupomRepository = cupomRepository;
         this.pedidoRepository = pedidoRepository;
+        this.confirmacaoPagamentoRepository = confirmacaoPagamentoRepository;
         this.logger = logger;
     }
 
@@ -118,7 +122,8 @@ public class LoginPresenter {
         PainelPrincipalView painelView = new PainelPrincipalView();
         PainelPrincipalPresenter painelPresenter = new PainelPrincipalPresenter(
                 painelView, usuarioRepository, clienteRepository, produtoRepository,
-                cupomRepository, pedidoRepository, sessaoService, logger);
+                cupomRepository, pedidoRepository, confirmacaoPagamentoRepository,
+                sessaoService, logger);
         painelView.setPresenter(painelPresenter);
         painelView.exibir();
     }

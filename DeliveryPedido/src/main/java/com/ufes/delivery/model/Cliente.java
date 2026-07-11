@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Cliente {
 
+    public static final int MAX_ENDERECOS = 3;
+
     private String nome;
     private String cpf;
     private final List<Endereco> enderecos;
@@ -74,8 +76,9 @@ public class Cliente {
 
 
     public void adicionarEndereco(Endereco endereco) {
-        if (enderecos.size() >= 3) {
-            throw new IllegalStateException("Máximo de 3 endereços por cliente");
+        if (enderecos.size() >= MAX_ENDERECOS) {
+            throw new IllegalStateException(
+                "Um cliente pode ter no máximo " + MAX_ENDERECOS + " endereços de entrega.");
         }
         if (endereco.isPadrao()) {
             enderecos.forEach(e -> e.setPadrao(false));
@@ -84,6 +87,10 @@ public class Cliente {
     }
 
     public void setEnderecos(List<Endereco> novosEnderecos) {
+        if (novosEnderecos != null && novosEnderecos.size() > MAX_ENDERECOS) {
+            throw new IllegalStateException(
+                "Um cliente pode ter no máximo " + MAX_ENDERECOS + " endereços de entrega.");
+        }
         this.enderecos.clear();
         if (novosEnderecos != null) {
             for (Endereco e : novosEnderecos) {

@@ -5,7 +5,6 @@ import com.ufes.delivery.model.perfil.Perfis;
 import com.ufes.delivery.model.situacao.Situacoes;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.persistencia.PersistenciaException;
-import com.ufes.delivery.util.SenhaUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,25 +20,6 @@ public class UsuarioRepositorySQLite implements IUsuarioRepository {
 
     public UsuarioRepositorySQLite(BancoDados banco) {
         this.banco = banco;
-        semearSeVazio();
-    }
-
-    private void semearSeVazio() {
-        if (existeUsuario()) {
-            return;
-        }
-        salvar(new Usuario("Administrador Master", "adminmaster",
-                SenhaUtil.hashSenha("Admin123"),
-                Perfis.ADMINISTRADOR, Situacoes.AUTORIZADO));
-        salvar(new Usuario("Carlos Atendente", "atendente01",
-                SenhaUtil.hashSenha("Atende01"),
-                Perfis.ATENDENTE, Situacoes.AUTORIZADO));
-        salvar(new Usuario("Maria Oliveira", "maria01",
-                SenhaUtil.hashSenha("Maria123"),
-                Perfis.ATENDENTE, Situacoes.PENDENTE));
-        salvar(new Usuario("Joao Silva", "joaosilva",
-                SenhaUtil.hashSenha("Joao1234"),
-                Perfis.ATENDENTE, Situacoes.NAO_AUTORIZADO));
     }
 
     @Override

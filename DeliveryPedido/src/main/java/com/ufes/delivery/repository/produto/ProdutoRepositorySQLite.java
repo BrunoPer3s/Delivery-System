@@ -66,27 +66,54 @@ public class ProdutoRepositorySQLite implements IProdutoRepository {
                 "Falha ao buscar produtos por categoria");
     }
 
+    private static final String SQL_SALVAR =
+            "INSERT INTO produtos (codigo, nome, categoria, preco_unitario, estoque_atual) "
+            + "VALUES (?, ?, ?, ?, ?) "
+            + "ON CONFLICT(codigo) DO UPDATE SET "
+            + "nome = excluded.nome, categoria = excluded.categoria, "
+            + "preco_unitario = excluded.preco_unitario, estoque_atual = excluded.estoque_atual";
+
     @Override
     public void salvar(Produto produto) {
         if (produto == null) {
             throw new IllegalArgumentException("Produto não pode ser nulo");
         }
-        String sql = "INSERT INTO produtos (codigo, nome, categoria, preco_unitario, estoque_atual) "
-                + "VALUES (?, ?, ?, ?, ?) "
-                + "ON CONFLICT(codigo) DO UPDATE SET "
-                + "nome = excluded.nome, categoria = excluded.categoria, "
-                + "preco_unitario = excluded.preco_unitario, estoque_atual = excluded.estoque_atual";
-        try (Connection c = banco.abrirConexao();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, produto.getCodigo());
-            ps.setString(2, produto.getNome());
-            ps.setString(3, produto.getCategoria());
-            ps.setDouble(4, produto.getPrecoUnitario());
-            ps.setInt(5, produto.getEstoqueAtual());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new PersistenciaException("Falha ao salvar produto", e);
+        salvarEmLote(List.of(produto));
+    }
+
+    @Override
+    public void salvarEmLote(List<Produto> produtos) {
+        if (produtos == null) {
+            throw new IllegalArgumentException("Lote de produtos não pode ser nulo");
         }
+        for (Produto produto : produtos) {
+            if (produto == null) {
+                throw new IllegalArgumentException("Produto não pode ser nulo");
+            }
+        }
+        if (produtos.isEmpty()) {
+            return;
+        }
+
+        banco.executarEmTransacao(c -> gravarEmLote(c, produtos));
+        observadores.notificar();
+    }
+
+    public void gravarEmLote(Connection conexao, List<Produto> produtos) throws SQLException {
+        try (PreparedStatement ps = conexao.prepareStatement(SQL_SALVAR)) {
+            for (Produto produto : produtos) {
+                ps.setInt(1, produto.getCodigo());
+                ps.setString(2, produto.getNome());
+                ps.setString(3, produto.getCategoria());
+                ps.setDouble(4, produto.getPrecoUnitario());
+                ps.setInt(5, produto.getEstoqueAtual());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    public void notificarAlteracao() {
         observadores.notificar();
     }
 

@@ -13,11 +13,15 @@ public interface IPedidoRepository {
 
     List<PedidoRegistro> listarTodos();
 
+    List<PedidoRegistro> listarPorData(String dataOperacao);
+
     Optional<PedidoRegistro> buscarPorCodigo(int codigo);
 
-    int contarPorEstado(EstadoPedido estado);
+    int contarPorEstadoNaData(EstadoPedido estado, String dataOperacao);
 
-    int total();
+    int contarEntreguesNaData(String dataOperacao);
+
+    int totalNaData(String dataOperacao);
 
     int proximoCodigo();
 

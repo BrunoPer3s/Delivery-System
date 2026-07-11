@@ -25,19 +25,25 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
         this.banco = banco;
     }
 
+    private static final String SQL_REGISTRAR =
+            "INSERT INTO pedidos (codigo, nome_cliente, data_pedido, data_conclusao, "
+            + "estado, valor_total) VALUES (?, ?, ?, ?, ?, ?) "
+            + "ON CONFLICT(codigo) DO UPDATE SET "
+            + "nome_cliente = excluded.nome_cliente, data_pedido = excluded.data_pedido, "
+            + "data_conclusao = excluded.data_conclusao, estado = excluded.estado, "
+            + "valor_total = excluded.valor_total";
+
     @Override
     public void registrar(PedidoRegistro pedido) {
         if (pedido == null) {
             throw new IllegalArgumentException("Pedido não pode ser nulo");
         }
-        String sql = "INSERT INTO pedidos (codigo, nome_cliente, data_pedido, data_conclusao, "
-                + "estado, valor_total) VALUES (?, ?, ?, ?, ?, ?) "
-                + "ON CONFLICT(codigo) DO UPDATE SET "
-                + "nome_cliente = excluded.nome_cliente, data_pedido = excluded.data_pedido, "
-                + "data_conclusao = excluded.data_conclusao, estado = excluded.estado, "
-                + "valor_total = excluded.valor_total";
-        try (Connection c = banco.abrirConexao();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        banco.executarEmTransacao(c -> gravar(c, pedido));
+        observadores.notificar();
+    }
+
+    public void gravar(Connection conexao, PedidoRegistro pedido) throws SQLException {
+        try (PreparedStatement ps = conexao.prepareStatement(SQL_REGISTRAR)) {
             ps.setInt(1, pedido.getCodigo());
             ps.setString(2, pedido.getNomeCliente());
             ps.setString(3, pedido.getDataPedido());
@@ -45,9 +51,10 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
             ps.setString(5, pedido.getEstado().getNome());
             ps.setString(6, pedido.getValorTotal());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new PersistenciaException("Falha ao registrar pedido", e);
         }
+    }
+
+    public void notificarAlteracao() {
         observadores.notificar();
     }
 
@@ -84,11 +91,31 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
     }
 
     @Override
-    public int contarPorEstado(EstadoPedido estado) {
-        String sql = "SELECT COUNT(*) FROM pedidos WHERE estado = ?";
+    public List<PedidoRegistro> listarPorData(String dataOperacao) {
+        String sql = "SELECT codigo, nome_cliente, data_pedido, data_conclusao, estado, valor_total "
+                + "FROM pedidos WHERE data_pedido = ? ORDER BY codigo";
+        List<PedidoRegistro> resultado = new ArrayList<>();
+        try (Connection c = banco.abrirConexao();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, dataOperacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(mapear(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new PersistenciaException("Falha ao listar pedidos da data de operação", e);
+        }
+        return resultado;
+    }
+
+    @Override
+    public int contarPorEstadoNaData(EstadoPedido estado, String dataOperacao) {
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE estado = ? AND data_pedido = ?";
         try (Connection c = banco.abrirConexao();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, estado.getNome());
+            ps.setString(2, dataOperacao);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
             }
@@ -98,12 +125,28 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
     }
 
     @Override
-    public int total() {
-        String sql = "SELECT COUNT(*) FROM pedidos";
+    public int contarEntreguesNaData(String dataOperacao) {
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE data_conclusao = ?";
         try (Connection c = banco.abrirConexao();
-             PreparedStatement ps = c.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getInt(1) : 0;
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, dataOperacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new PersistenciaException("Falha ao contar pedidos entregues", e);
+        }
+    }
+
+    @Override
+    public int totalNaData(String dataOperacao) {
+        String sql = "SELECT COUNT(*) FROM pedidos WHERE data_pedido = ?";
+        try (Connection c = banco.abrirConexao();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, dataOperacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
         } catch (SQLException e) {
             throw new PersistenciaException("Falha ao contar pedidos", e);
         }
