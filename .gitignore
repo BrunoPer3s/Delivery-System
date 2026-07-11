@@ -7,6 +7,14 @@ log.*
 *.jsonl
 *.csv
 
+# SQLite database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
 # Maven
 target/
 pom.xml.tag

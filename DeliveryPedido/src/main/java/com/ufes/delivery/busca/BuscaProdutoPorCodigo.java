@@ -1,7 +1,7 @@
 package com.ufes.delivery.busca;
 
 import com.ufes.delivery.model.Produto;
-import com.ufes.delivery.repository.IProdutoRepository;
+import com.ufes.delivery.repository.produto.IProdutoRepository;
 
 import java.util.List;
 

@@ -1,21 +1,22 @@
 package com.ufes.delivery;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
-import com.ufes.delivery.presenter.LoginPresenter;
-import com.ufes.delivery.repository.ClienteRepositoryEmMemoria;
-import com.ufes.delivery.repository.CupomRepositoryEmMemoria;
-import com.ufes.delivery.repository.IClienteRepository;
-import com.ufes.delivery.repository.ICupomRepository;
-import com.ufes.delivery.repository.IPedidoRepository;
-import com.ufes.delivery.repository.IProdutoRepository;
-import com.ufes.delivery.repository.IUsuarioRepository;
-import com.ufes.delivery.repository.PedidoRepositoryEmMemoria;
-import com.ufes.delivery.repository.ProdutoRepositoryEmMemoria;
-import com.ufes.delivery.repository.UsuarioRepositoryEmMemoria;
+import com.ufes.delivery.persistencia.BancoDados;
+import com.ufes.delivery.presenter.login.LoginPresenter;
+import com.ufes.delivery.repository.cliente.ClienteRepositorySQLite;
+import com.ufes.delivery.repository.cupom.CupomRepositorySQLite;
+import com.ufes.delivery.repository.cliente.IClienteRepository;
+import com.ufes.delivery.repository.cupom.ICupomRepository;
+import com.ufes.delivery.repository.pedido.IPedidoRepository;
+import com.ufes.delivery.repository.produto.IProdutoRepository;
+import com.ufes.delivery.repository.usuario.IUsuarioRepository;
+import com.ufes.delivery.repository.pedido.PedidoRepositorySQLite;
+import com.ufes.delivery.repository.produto.ProdutoRepositorySQLite;
+import com.ufes.delivery.repository.usuario.UsuarioRepositorySQLite;
 import com.ufes.delivery.service.AutenticacaoService;
 import com.ufes.delivery.service.SessaoService;
 import com.ufes.delivery.service.SimuladorCicloPedidoService;
-import com.ufes.delivery.view.LoginView;
+import com.ufes.delivery.view.login.LoginView;
 import com.ufes.log.JsonlLogger;
 
 import javax.swing.*;
@@ -32,11 +33,14 @@ public class DeliveryApplication {
         SwingUtilities.invokeLater(() -> {
             GerenciadorDeLogAtivo logger = new GerenciadorDeLogAtivo(new JsonlLogger());
 
-            IUsuarioRepository usuarioRepository = new UsuarioRepositoryEmMemoria();
-            IClienteRepository clienteRepository = new ClienteRepositoryEmMemoria();
-            IProdutoRepository produtoRepository = new ProdutoRepositoryEmMemoria();
-            ICupomRepository cupomRepository = new CupomRepositoryEmMemoria();
-            IPedidoRepository pedidoRepository = new PedidoRepositoryEmMemoria();
+            BancoDados banco = new BancoDados();
+            banco.inicializar();
+
+            IUsuarioRepository usuarioRepository = new UsuarioRepositorySQLite(banco);
+            IClienteRepository clienteRepository = new ClienteRepositorySQLite(banco);
+            IProdutoRepository produtoRepository = new ProdutoRepositorySQLite(banco);
+            ICupomRepository cupomRepository = new CupomRepositorySQLite(banco);
+            IPedidoRepository pedidoRepository = new PedidoRepositorySQLite(banco);
 
             AutenticacaoService autenticacaoService =
                     new AutenticacaoService(usuarioRepository, logger);

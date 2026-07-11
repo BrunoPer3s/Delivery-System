@@ -1,7 +1,7 @@
 package com.ufes.delivery.busca;
 
 import com.ufes.delivery.model.Cliente;
-import com.ufes.delivery.repository.IClienteRepository;
+import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.util.CpfUtil;
 
 import java.util.List;

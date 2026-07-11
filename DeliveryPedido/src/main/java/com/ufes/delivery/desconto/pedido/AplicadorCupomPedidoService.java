@@ -4,7 +4,7 @@ import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.log.ILogger;
 import com.ufes.delivery.model.CupomDescontoPedido;
 import com.ufes.delivery.model.Pedido;
-import com.ufes.delivery.repository.ICupomRepository;
+import com.ufes.delivery.repository.cupom.ICupomRepository;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;

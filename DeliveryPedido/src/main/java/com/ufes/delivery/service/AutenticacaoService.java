@@ -3,8 +3,7 @@ package com.ufes.delivery.service;
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.enums.SituacaoUsuario;
-import com.ufes.delivery.repository.IUsuarioRepository;
+import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.util.SenhaUtil;
 
 import java.util.Optional;
@@ -38,7 +37,7 @@ public class AutenticacaoService {
             return ResultadoAutenticacao.credenciaisInvalidas();
         }
 
-        if (usuario.getSituacao() != SituacaoUsuario.AUTORIZADO) {
+        if (!usuario.getSituacao().podeIniciarSessao()) {
             registrarAuditoria(nomeUsuario,
                 "Autenticação - Falha: usuário " + usuario.getSituacao().getDescricao());
             return ResultadoAutenticacao.naoAutorizado();

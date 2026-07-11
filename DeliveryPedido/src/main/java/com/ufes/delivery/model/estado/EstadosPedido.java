@@ -16,5 +16,14 @@ public final class EstadosPedido {
             AGUARDANDO_ENTREGA, EM_TRANSITO, ENTREGUE);
 
     private EstadosPedido() {}
+
+    public static EstadoPedido porNome(String nome) {
+        for (EstadoPedido estado : CICLO) {
+            if (estado.getNome().equals(nome)) {
+                return estado;
+            }
+        }
+        throw new IllegalArgumentException("Estado de pedido desconhecido: " + nome);
+    }
 }
 

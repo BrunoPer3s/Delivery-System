@@ -1,4 +1,4 @@
-# Delivery System - CR2
+# Delivery System
 
 ## Equipe
 - **Vinicius de Mello**
@@ -6,13 +6,20 @@
 - **Sahuan Pimentel**
 
 ## Projeto
-Este projeto é um sistema de entrega de pedidos (Delivery) com um módulo independente de auditoria de logs, desenvolvido como parte da disciplina de Projetos de Sistemas de Software da UFES (Curso: Ciência da Computação).
+Sistema de entrega de pedidos (Delivery) desenvolvido na disciplina de Projetos de Sistemas de Software da UFES (Ciência da Computação). Cobre as histórias US01 a US12 (autenticação, gestão de usuários, clientes, produtos, estoque, pedido, pagamento simulado e auditoria), seguindo o modelo MVP Passive View. A auditoria de logs é uma biblioteca independente, reaproveitada do CR2.
 
 ## Estrutura do Projeto
-- `log-auditoria`: Biblioteca independente para registro de logs em formatos JSONL, CSV e XML (Padrão Strategy).
-- `DeliveryPedido`: Sistema de delivery que consome a biblioteca de logs.
+- `log-auditoria`: Biblioteca independente de registro de logs em JSONL, CSV e XML (Padrão Strategy). **Publicada via JitPack** e consumida como dependência externa.
+- `DeliveryPedido`: Aplicação desktop (Swing) do delivery. Persistência em **SQLite**; repositórios em memória mantidos como implementação alternativa atrás das mesmas interfaces.
+
+## Pré-requisitos
+- **JDK 21**
+- **Maven 3.8+**
+- **Acesso à internet** no primeiro build (baixa `log-auditoria` do `jitpack.io` e `sqlite-jdbc` do Maven Central).
 
 ## Como Executar e Testar
+
+Todos os comandos são executados a partir da pasta `Delivery-System/` (onde fica o `pom.xml` pai).
 
 ### 1. Clonar o Repositório
 ```bash
@@ -20,21 +27,29 @@ git clone https://github.com/BrunoPer3s/Delivery-System.git
 cd Delivery-System
 ```
 
-### 2. Build e Verificação de Dependência (JitPack)
-Para garantir que o sistema está baixando a biblioteca `log-auditoria` da nuvem e não usando uma pasta local:
+### 2. Build
 ```bash
 mvn clean install -pl DeliveryPedido
 ```
-*Observe no log que o Maven fará o download do JAR a partir de `jitpack.io`.*
+No log, o Maven baixa a biblioteca `log-auditoria` de `jitpack.io` e o driver `sqlite-jdbc` do Maven Central.
 
 ### 3. Executar o Sistema
-Para rodar o caso de uso principal e ver os logs sendo gerados:
 ```bash
 mvn exec:java -pl DeliveryPedido
 ```
-Os arquivos de log serão gerados na pasta raiz do projeto (`log.jsonl`, `log.csv`, etc), comprovando o funcionamento da biblioteca externa.
+Abre a **tela de login** do sistema. Credenciais de teste criadas automaticamente:
 
-## Estrutura do Projeto (CR2)
-- `log-auditoria`: Biblioteca independente (Padrão Strategy). **Publicada via JitPack**.
-- `DeliveryPedido`: Sistema de delivery que consome `log-auditoria` como dependência externa.
+| Usuário | Senha | Perfil | Situação |
+|---|---|---|---|
+| `adminmaster` | `Admin123` | Administrador | Autorizado |
+| `atendente01` | `Atende01` | Atendente | Autorizado |
 
+(Usuários novos cadastrados nascem como *Pendente* e só acessam após um administrador autorizá-los em *Gerenciar usuários*.)
+
+## Persistência (SQLite)
+- Ao iniciar, é criado o arquivo **`delivery.db`** na pasta de execução, com dados de exemplo (usuários, clientes, produtos e cupons).
+- Os dados **persistem entre execuções** (clientes, produtos, estoque, pedidos, usuários).
+- Para **reiniciar do zero**, feche a aplicação e apague o `delivery.db` — os dados de exemplo são recriados no próximo start.
+
+## Auditoria (logs)
+Os arquivos de log (`log.jsonl`, `log.csv`, `log.xml`) são gerados na pasta de execução, comprovando o funcionamento da biblioteca externa `log-auditoria`.

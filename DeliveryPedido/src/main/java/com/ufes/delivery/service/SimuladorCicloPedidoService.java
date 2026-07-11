@@ -2,8 +2,8 @@ package com.ufes.delivery.service;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.log.MensagemLogFactory;
-import com.ufes.delivery.repository.IPedidoRepository;
-import com.ufes.delivery.repository.TransicaoEstadoPedido;
+import com.ufes.delivery.repository.pedido.IPedidoRepository;
+import com.ufes.delivery.repository.pedido.TransicaoEstadoPedido;
 
 import javax.swing.Timer;
 import java.util.List;

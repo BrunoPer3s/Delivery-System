@@ -11,7 +11,7 @@ import com.ufes.delivery.model.Cliente;
 import com.ufes.delivery.model.CupomDescontoPedido;
 import com.ufes.delivery.model.Item;
 import com.ufes.delivery.model.Pedido;
-import com.ufes.delivery.repository.CupomRepositoryEmMemoria;
+import com.ufes.delivery.repository.cupom.CupomRepositoryEmMemoria;
 import java.time.LocalDateTime;
 
 public class UmCasoDeUsoDePedido {

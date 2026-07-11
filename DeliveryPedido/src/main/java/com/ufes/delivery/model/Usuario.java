@@ -1,18 +1,18 @@
 package com.ufes.delivery.model;
 
-import com.ufes.delivery.model.enums.PerfilUsuario;
-import com.ufes.delivery.model.enums.SituacaoUsuario;
+import com.ufes.delivery.model.perfil.Perfil;
+import com.ufes.delivery.model.situacao.Situacao;
 
 public class Usuario {
 
     private String nome;
     private String nomeUsuario;
     private String senhaHash;
-    private PerfilUsuario perfil;
-    private SituacaoUsuario situacao;
+    private Perfil perfil;
+    private Situacao situacao;
 
     public Usuario(String nome, String nomeUsuario, String senhaHash,
-                   PerfilUsuario perfil, SituacaoUsuario situacao) {
+                   Perfil perfil, Situacao situacao) {
         validarNome(nome);
         validarNomeUsuario(nomeUsuario);
         if (senhaHash == null || senhaHash.isBlank()) {
@@ -62,21 +62,24 @@ public class Usuario {
     public String getNome() { return nome; }
     public String getNomeUsuario() { return nomeUsuario; }
     public String getSenhaHash() { return senhaHash; }
-    public PerfilUsuario getPerfil() { return perfil; }
-    public SituacaoUsuario getSituacao() { return situacao; }
+    public Perfil getPerfil() { return perfil; }
+    public Situacao getSituacao() { return situacao; }
 
-    public void setPerfil(PerfilUsuario perfil) {
+    public void setPerfil(Perfil perfil) {
         if (perfil == null) throw new IllegalArgumentException("Perfil é obrigatório");
         this.perfil = perfil;
     }
 
-    public void setSituacao(SituacaoUsuario situacao) {
-        if (situacao == null) throw new IllegalArgumentException("Situação é obrigatória");
-        this.situacao = situacao;
+    public void autorizar() {
+        this.situacao = situacao.autorizar();
+    }
+
+    public void desautorizar() {
+        this.situacao = situacao.desautorizar();
     }
 
     public boolean isAutorizado() {
-        return this.situacao == SituacaoUsuario.AUTORIZADO;
+        return this.situacao.podeIniciarSessao();
     }
 
     @Override

@@ -1,5 +1,0 @@
-package com.ufes.delivery.repository;
-
-public record TransicaoEstadoPedido(int codigoPedido, String estadoAnterior, String estadoNovo) {
-}
-

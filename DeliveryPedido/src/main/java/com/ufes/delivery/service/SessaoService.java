@@ -2,7 +2,6 @@ package com.ufes.delivery.service;
 
 import com.ufes.delivery.model.Sessao;
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.enums.PerfilUsuario;
 
 import java.time.LocalDateTime;
 
@@ -43,7 +42,7 @@ public class SessaoService {
 
     public boolean isAdministrador() {
         return sessaoAtual != null
-                && sessaoAtual.getUsuario().getPerfil() == PerfilUsuario.ADMINISTRADOR;
+                && sessaoAtual.getUsuario().getPerfil().podeAdministrar();
     }
 
     public String getNomeUsuarioLogado() {
