@@ -24,11 +24,7 @@ class LoginPresenterTest {
                 usuarioRepository, null, null, null, null, null, null);
     }
 
-    @AfterEach
-    void limparSessao() {
-        SessaoService.getInstancia().encerrarSessao();
-    }
-
+    //Teste referente a user story "US01 - Autenticar usuário e iniciar sessão" como explicado em AutenticacaoServiceTeste
     @Test
     @DisplayName("Cenário 3 - Rejeitar nome de usuário com espaço")
     void rejeitaNomeUsuarioComEspaco() {
@@ -42,6 +38,7 @@ class LoginPresenterTest {
         assertFalse(view.isFechada());
     }
 
+    //Teste referente a user story "US01 - Autenticar usuário e iniciar sessão" como explicado em AutenticacaoServiceTeste
     @Test
     @DisplayName("Cenário 3 - Rejeitar nome de usuário com letra maiúscula")
     void rejeitaNomeUsuarioComMaiuscula() {
@@ -52,6 +49,11 @@ class LoginPresenterTest {
         assertNotNull(view.getMensagemErro());
         assertTrue(view.getMensagemErro().contains("minúsculas"));
         assertFalse(SessaoService.getInstancia().isAutenticado());
+    }
+
+    @AfterEach
+    void limparSessao() {
+        SessaoService.getInstancia().encerrarSessao();
     }
 
     @Test
