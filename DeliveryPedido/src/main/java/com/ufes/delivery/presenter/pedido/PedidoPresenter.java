@@ -1,41 +1,26 @@
 package com.ufes.delivery.presenter.pedido;
 
-import com.ufes.delivery.presenter.cliente.CadastroClientePresenter;
-
-import com.ufes.delivery.log.GerenciadorDeLogAtivo;
-import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.delivery.desconto.pedido.AplicadorCupomPedidoService;
 import com.ufes.delivery.desconto.taxa.entrega.CalculadoraTaxaDescontoPedidoService;
-import com.ufes.delivery.model.Cliente;
-import com.ufes.delivery.model.CupomDescontoPedido;
-import com.ufes.delivery.model.Endereco;
-import com.ufes.delivery.model.Item;
-import com.ufes.delivery.model.Pedido;
-import com.ufes.delivery.model.Produto;
-import com.ufes.delivery.model.estado.EstadosPedido;
+import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.delivery.model.*;
+import com.ufes.delivery.model.estado.AguardandoEntrega;
+import com.ufes.delivery.presenter.cliente.CadastroClientePresenter;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
 import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
-import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.pedido.PedidoRegistro;
-import com.ufes.delivery.service.FonteAleatoriedadePadrao;
-import com.ufes.delivery.service.IFonteAleatoriedade;
-import com.ufes.delivery.service.ResultadoPagamento;
-import com.ufes.delivery.service.SessaoService;
-import com.ufes.delivery.service.SimuladorPagamentoService;
+import com.ufes.delivery.repository.produto.IProdutoRepository;
+import com.ufes.delivery.service.*;
 import com.ufes.delivery.view.cliente.CadastroClienteView;
 import com.ufes.delivery.view.pedido.IPedidoView;
 import com.ufes.delivery.view.pedido.ResultadoPagamentoView;
 
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class PedidoPresenter {
 
@@ -404,7 +389,7 @@ public class PedidoPresenter {
                     clienteSelecionado.getNome(),
                     dataPedidoStr,
                     null,
-                    EstadosPedido.AGUARDANDO_ENTREGA,
+                    AguardandoEntrega.INSTANCIA,
                     totalFormatado);
 
             try {
@@ -428,7 +413,7 @@ public class PedidoPresenter {
                     + resultado.getFormaPagamento() + " - Cliente: "
                     + clienteSelecionado.getNome() + " - Total: " + totalFormatado);
             registrarAuditoria("Transição de estado - Pedido #" + pedido.getCodigo()
-                    + " para " + EstadosPedido.AGUARDANDO_ENTREGA.getNome());
+                    + " para " + AguardandoEntrega.INSTANCIA.getNome());
 
             new ResultadoPagamentoView(
                     resultado, pedido.getCodigo(),

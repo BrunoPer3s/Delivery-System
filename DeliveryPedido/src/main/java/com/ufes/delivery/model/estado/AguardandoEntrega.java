@@ -1,15 +1,10 @@
 package com.ufes.delivery.model.estado;
 
-public final class AguardandoEntrega implements EstadoPedido {
+public final class AguardandoEntrega extends EstadoPedido {
 
     public static final AguardandoEntrega INSTANCIA = new AguardandoEntrega();
 
     private AguardandoEntrega() {}
-
-    @Override
-    public String getNome() {
-        return "Aguardando entrega";
-    }
 
     @Override
     public EstadoPedido avancar() {

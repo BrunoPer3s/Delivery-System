@@ -1,35 +1,34 @@
 package com.ufes.delivery.presenter.painel;
 
-import com.ufes.delivery.presenter.cliente.BuscaClientePresenter;
-import com.ufes.delivery.presenter.produto.BuscaProdutoPresenter;
-import com.ufes.delivery.presenter.cliente.CadastroClientePresenter;
-import com.ufes.delivery.presenter.produto.CadastroProdutoPresenter;
-import com.ufes.delivery.presenter.usuario.GestaoUsuarioPresenter;
-import com.ufes.delivery.presenter.estoque.MovimentacaoEstoquePresenter;
-import com.ufes.delivery.presenter.pedido.PedidoPresenter;
-
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.log.MensagemLogFactory;
-import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.model.Sessao;
-import com.ufes.delivery.model.estado.EstadosPedido;
+import com.ufes.delivery.model.estado.*;
+import com.ufes.delivery.presenter.cliente.BuscaClientePresenter;
+import com.ufes.delivery.presenter.cliente.CadastroClientePresenter;
+import com.ufes.delivery.presenter.estoque.MovimentacaoEstoquePresenter;
+import com.ufes.delivery.presenter.pedido.PedidoPresenter;
+import com.ufes.delivery.presenter.produto.BuscaProdutoPresenter;
+import com.ufes.delivery.presenter.produto.CadastroProdutoPresenter;
+import com.ufes.delivery.presenter.usuario.GestaoUsuarioPresenter;
+import com.ufes.delivery.repository.RepositorioObserver;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
+import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
+import com.ufes.delivery.repository.pedido.PedidoRegistro;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
-import com.ufes.delivery.repository.pedido.PedidoRegistro;
-import com.ufes.delivery.repository.RepositorioObserver;
 import com.ufes.delivery.service.SessaoService;
 import com.ufes.delivery.view.cliente.BuscaClienteView;
-import com.ufes.delivery.view.produto.BuscaProdutoView;
 import com.ufes.delivery.view.cliente.CadastroClienteView;
-import com.ufes.delivery.view.produto.CadastroProdutoView;
-import com.ufes.delivery.view.usuario.GestaoUsuarioView;
-import com.ufes.delivery.view.painel.IPainelPrincipalView;
 import com.ufes.delivery.view.estoque.MovimentacaoEstoqueView;
+import com.ufes.delivery.view.painel.IPainelPrincipalView;
 import com.ufes.delivery.view.pedido.PedidoView;
 import com.ufes.delivery.view.pedido.VisualizacaoPedidoView;
+import com.ufes.delivery.view.produto.BuscaProdutoView;
+import com.ufes.delivery.view.produto.CadastroProdutoView;
+import com.ufes.delivery.view.usuario.GestaoUsuarioView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -109,15 +108,15 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
         view.carregarPedidos(dadosTabela);
 
         int total = pedidoRepository.totalNaData(dataOperacao);
-        int novos = pedidoRepository.contarPorEstadoNaData(EstadosPedido.NOVO, dataOperacao);
+        int novos = pedidoRepository.contarPorEstadoNaData(Novo.INSTANCIA, dataOperacao);
         int aguardandoPagamento = pedidoRepository.contarPorEstadoNaData(
-                EstadosPedido.AGUARDANDO_PAGAMENTO, dataOperacao);
+                AguardandoPagamento.INSTANCIA, dataOperacao);
         int emPreparo = pedidoRepository.contarPorEstadoNaData(
-                EstadosPedido.EM_PREPARO, dataOperacao);
+                EmPreparo.INSTANCIA, dataOperacao);
         int aguardandoEntrega = pedidoRepository.contarPorEstadoNaData(
-                EstadosPedido.AGUARDANDO_ENTREGA, dataOperacao);
+                AguardandoEntrega.INSTANCIA, dataOperacao);
         int emTransito = pedidoRepository.contarPorEstadoNaData(
-                EstadosPedido.EM_TRANSITO, dataOperacao);
+                EmTransito.INSTANCIA, dataOperacao);
         int entregues = pedidoRepository.contarEntreguesNaData(dataOperacao);
 
         view.setMetricas(total, novos, aguardandoPagamento, emPreparo,

@@ -6,14 +6,15 @@ import java.util.List;
 public abstract class Situacao {
 
     private static final List<Situacao> TODAS = new ArrayList<>();
-    public abstract boolean podeIniciarSessao();
 
-    public  String getDescricao() {
-        return this.getClass().getSimpleName();
-    }
+    public abstract boolean podeIniciarSessao();
 
     protected static void todasSituacoes(Situacao instancia) {
         TODAS.add(instancia);
+    }
+
+    public  String getDescricao() {
+        return this.getClass().getSimpleName();
     }
 
     public Situacao autorizar() {

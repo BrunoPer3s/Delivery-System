@@ -1,12 +1,10 @@
 package com.ufes.delivery.repository.pedido;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-import com.ufes.delivery.repository.SuporteObservadores;
-
 import com.ufes.delivery.model.estado.EstadoPedido;
-import com.ufes.delivery.model.estado.EstadosPedido;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.persistencia.PersistenciaException;
+import com.ufes.delivery.repository.RepositorioObserver;
+import com.ufes.delivery.repository.SuporteObservadores;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -224,7 +222,7 @@ public class PedidoRepositorySQLite implements IPedidoRepository {
                 rs.getString("nome_cliente"),
                 rs.getString("data_pedido"),
                 rs.getString("data_conclusao"),
-                EstadosPedido.porNome(rs.getString("estado")),
+                EstadoPedido.porNome(rs.getString("estado")),
                 rs.getString("valor_total"));
     }
 }

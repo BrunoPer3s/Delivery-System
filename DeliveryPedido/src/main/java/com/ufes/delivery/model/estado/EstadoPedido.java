@@ -1,11 +1,31 @@
 package com.ufes.delivery.model.estado;
 
-public interface EstadoPedido {
+import java.util.ArrayList;
+import java.util.List;
 
-    String getNome();
+public abstract class EstadoPedido {
 
-    EstadoPedido avancar();
+    private static final List<EstadoPedido> TODOS = new ArrayList<>();
 
-    boolean isConclusivo();
+    public abstract EstadoPedido avancar();
+
+    public abstract boolean isConclusivo();
+
+    protected static void todosEstadosPedido(EstadoPedido instancia) {
+        TODOS.add(instancia);
+    }
+
+    public String getNome() {
+        return this.getClass().getSimpleName();
+    }
+
+    public static EstadoPedido porNome(String nome) {
+        for (EstadoPedido estado : TODOS) {
+            if (estado.getNome().equals(nome)) {
+                return estado;
+            }
+        }
+        throw new IllegalArgumentException("Estado de pedido desconhecido: " + nome);
+    }
 }
 

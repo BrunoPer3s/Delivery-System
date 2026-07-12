@@ -1,15 +1,10 @@
 package com.ufes.delivery.model.estado;
 
-public final class EmTransito implements EstadoPedido {
+public final class EmTransito extends EstadoPedido {
 
     public static final EmTransito INSTANCIA = new EmTransito();
 
     private EmTransito() {}
-
-    @Override
-    public String getNome() {
-        return "Em trânsito";
-    }
 
     @Override
     public EstadoPedido avancar() {
