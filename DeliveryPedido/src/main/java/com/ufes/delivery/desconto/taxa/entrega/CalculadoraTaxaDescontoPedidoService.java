@@ -1,9 +1,10 @@
 package com.ufes.delivery.desconto.taxa.entrega;
 
+import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.delivery.model.CupomDescontoEntrega;
 import com.ufes.delivery.model.Pedido;
 import com.ufes.log.ILogger;
-import com.ufes.delivery.log.MensagemLogFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 

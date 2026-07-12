@@ -1,11 +1,10 @@
 package com.ufes.delivery.repository.produto;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-import com.ufes.delivery.repository.SuporteObservadores;
-
 import com.ufes.delivery.model.Produto;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.persistencia.PersistenciaException;
+import com.ufes.delivery.repository.RepositorioObserver;
+import com.ufes.delivery.repository.SuporteObservadores;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

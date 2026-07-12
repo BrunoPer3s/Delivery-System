@@ -1,16 +1,11 @@
 package com.ufes.delivery.repository.cliente;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-
 import com.ufes.delivery.model.Cliente;
 import com.ufes.delivery.model.Endereco;
+import com.ufes.delivery.repository.RepositorioObserver;
 import com.ufes.delivery.util.CpfUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class ClienteRepositoryEmMemoria implements IClienteRepository {
 

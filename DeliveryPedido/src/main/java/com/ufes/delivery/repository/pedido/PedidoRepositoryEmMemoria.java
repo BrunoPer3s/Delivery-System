@@ -1,14 +1,9 @@
 package com.ufes.delivery.repository.pedido;
 
+import com.ufes.delivery.model.estado.EstadoPedido;
 import com.ufes.delivery.repository.RepositorioObserver;
 
-import com.ufes.delivery.model.estado.EstadoPedido;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class PedidoRepositoryEmMemoria implements IPedidoRepository {
 
