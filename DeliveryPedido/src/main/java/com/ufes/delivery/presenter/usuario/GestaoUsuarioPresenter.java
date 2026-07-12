@@ -4,7 +4,6 @@ import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.delivery.model.Usuario;
 import com.ufes.delivery.model.perfil.Perfil;
-import com.ufes.delivery.model.perfil.Perfis;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.service.SessaoService;
 import com.ufes.delivery.view.usuario.CadastroUsuarioView;
@@ -146,7 +145,7 @@ public class GestaoUsuarioPresenter {
 
     public void onPerfilAlterado(String nomeUsuario, String novoPerfil) {
         usuarioRepository.buscarPorNomeUsuario(nomeUsuario).ifPresent(usuario -> {
-            Perfil perfil = Perfis.porDescricao(novoPerfil);
+            Perfil perfil = Perfil.porDescricao(novoPerfil);
             usuario.setPerfil(perfil);
             usuarioRepository.salvar(usuario);
             registrarAuditoria("Alteração de perfil de " + nomeUsuario +

@@ -1,10 +1,9 @@
 package com.ufes.delivery.presenter.login;
 
-import com.ufes.delivery.presenter.usuario.CadastroUsuarioPresenter;
-import com.ufes.delivery.presenter.painel.PainelPrincipalPresenter;
-
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.model.Sessao;
+import com.ufes.delivery.presenter.painel.PainelPrincipalPresenter;
+import com.ufes.delivery.presenter.usuario.CadastroUsuarioPresenter;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
 import com.ufes.delivery.repository.pagamento.IConfirmacaoPagamentoRepository;
@@ -12,11 +11,11 @@ import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.service.AutenticacaoService;
-import com.ufes.delivery.service.AutenticacaoService.ResultadoAutenticacao;
+import com.ufes.delivery.service.ResultadoAutenticacao;
 import com.ufes.delivery.service.SessaoService;
-import com.ufes.delivery.view.usuario.CadastroUsuarioView;
 import com.ufes.delivery.view.login.ILoginView;
 import com.ufes.delivery.view.painel.PainelPrincipalView;
+import com.ufes.delivery.view.usuario.CadastroUsuarioView;
 
 public class LoginPresenter {
 

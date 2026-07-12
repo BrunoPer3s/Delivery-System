@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.situacao;
 
-public final class Pendente implements Situacao {
+public final class Pendente extends Situacao {
 
     public static final Pendente INSTANCIA = new Pendente();
 
-    private Pendente() {}
-
-    @Override
-    public String getDescricao() {
-        return "Pendente";
+    private Pendente() {
+        todasSituacoes(INSTANCIA);
     }
 
     @Override

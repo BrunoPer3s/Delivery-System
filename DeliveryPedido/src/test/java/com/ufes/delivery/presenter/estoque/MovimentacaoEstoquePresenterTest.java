@@ -2,8 +2,9 @@ package com.ufes.delivery.presenter.estoque;
 
 import com.ufes.delivery.apoio.MovimentacaoEstoqueViewStub;
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
+import com.ufes.delivery.model.situacao.Autorizado;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.produto.ProdutoRepositorySQLite;
@@ -19,10 +20,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("US08 - Registrar movimentação de estoque")
 class MovimentacaoEstoquePresenterTest {
@@ -45,7 +43,7 @@ class MovimentacaoEstoquePresenterTest {
         produtoRepository = new ProdutoRepositorySQLite(banco);
 
         sessaoService = SessaoService.getInstancia();
-        logarComo(Perfis.ADMINISTRADOR);
+        logarComo(Administrador.INSTANCIA);
 
         view = new MovimentacaoEstoqueViewStub();
         presenter = new MovimentacaoEstoquePresenter(view, produtoRepository, null, sessaoService);
@@ -58,7 +56,7 @@ class MovimentacaoEstoquePresenterTest {
 
     private void logarComo(com.ufes.delivery.model.perfil.Perfil perfil) {
         sessaoService.iniciarSessao(new Usuario("Usuario Teste", "usuario01",
-                SenhaUtil.hashSenha("Senha123"), perfil, Situacoes.AUTORIZADO));
+                SenhaUtil.hashSenha("Senha123"), perfil, Autorizado.INSTANCIA));
     }
 
     private String hoje() {
@@ -196,7 +194,7 @@ class MovimentacaoEstoquePresenterTest {
         selecionarCaderno();
         view.preencherMovimentacao(hoje(), "Entrada", "30", null, "NF-12345");
 
-        logarComo(Perfis.ATENDENTE);
+        logarComo(Atendente.INSTANCIA);
         presenter.onConfirmarMovimentacao();
 
         assertNotNull(view.getMensagemErro());

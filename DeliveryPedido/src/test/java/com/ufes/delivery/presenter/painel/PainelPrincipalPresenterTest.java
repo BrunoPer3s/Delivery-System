@@ -4,9 +4,10 @@ import com.ufes.delivery.apoio.PainelPrincipalViewStub;
 import com.ufes.delivery.model.Usuario;
 import com.ufes.delivery.model.estado.EstadoPedido;
 import com.ufes.delivery.model.estado.EstadosPedido;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
 import com.ufes.delivery.model.perfil.Perfil;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.situacao.Autorizado;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.pedido.PedidoRegistro;
 import com.ufes.delivery.repository.pedido.PedidoRepositoryEmMemoria;
@@ -21,9 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("US04 - Acessar o painel operacional")
 class PainelPrincipalPresenterTest {
@@ -61,11 +60,11 @@ class PainelPrincipalPresenterTest {
 
     private void logarComo(Perfil perfil) {
         sessaoService.iniciarSessao(new Usuario("Usuario Teste", "usuario01",
-                SenhaUtil.hashSenha("Senha123"), perfil, Situacoes.AUTORIZADO));
+                SenhaUtil.hashSenha("Senha123"), perfil, Autorizado.INSTANCIA));
     }
 
     private void abrirPainel() {
-        logarComo(Perfis.ADMINISTRADOR);
+        logarComo(Administrador.INSTANCIA);
         new PainelPrincipalPresenter(view, null, null, null, null,
                 pedidoRepository, null, sessaoService, null);
     }
@@ -163,7 +162,7 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("O menu administrativo é habilitado apenas para o perfil Administrador")
     void menuAdministrativoRestritoAoAdministrador() {
-        logarComo(Perfis.ATENDENTE);
+        logarComo(Atendente.INSTANCIA);
         new PainelPrincipalPresenter(view, null, null, null, null,
                 pedidoRepository, null, sessaoService, null);
 

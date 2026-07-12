@@ -1,8 +1,8 @@
 package com.ufes.delivery.repository.usuario;
 
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Perfil;
+import com.ufes.delivery.model.situacao.Situacao;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.persistencia.PersistenciaException;
 
@@ -126,7 +126,7 @@ public class UsuarioRepositorySQLite implements IUsuarioRepository {
                 rs.getString("nome"),
                 rs.getString("nome_usuario"),
                 rs.getString("senha_hash"),
-                Perfis.porDescricao(rs.getString("perfil")),
-                Situacoes.porDescricao(rs.getString("situacao")));
+                Perfil.porDescricao(rs.getString("perfil")),
+                Situacao.porDescricao(rs.getString("situacao")));
     }
 }

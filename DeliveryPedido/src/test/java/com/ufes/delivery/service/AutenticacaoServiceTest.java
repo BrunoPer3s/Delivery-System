@@ -1,21 +1,23 @@
 package com.ufes.delivery.service;
 
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
+import com.ufes.delivery.model.situacao.Autorizado;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.repository.usuario.UsuarioRepositoryEmMemoria;
-import com.ufes.delivery.service.AutenticacaoService.ResultadoAutenticacao;
 import com.ufes.delivery.util.SenhaUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+* Optamos pelo uso do Fake Object porque a camada de Service se tratar estritamente das regras
+* de negócio e usar o banco em memória garante rapidez nos testes, além de isolamento dos dados
+* e proteção aos dados dos usuarios/clientes.
+ */
 
 @DisplayName("US01 - Autenticar usuário e iniciar sessão")
 class AutenticacaoServiceTest {
@@ -35,7 +37,7 @@ class AutenticacaoServiceTest {
         ResultadoAutenticacao resultado = autenticacaoService.autenticar("adminmaster", "Admin123");
 
         assertTrue(resultado.isSucesso());
-        assertEquals(Perfis.ADMINISTRADOR, resultado.getUsuario().getPerfil());
+        assertEquals(Administrador.INSTANCIA, resultado.getUsuario().getPerfil());
         assertTrue(resultado.getUsuario().getPerfil().podeAdministrar());
     }
 
@@ -45,7 +47,7 @@ class AutenticacaoServiceTest {
         ResultadoAutenticacao resultado = autenticacaoService.autenticar("atendente01", "Atende01");
 
         assertTrue(resultado.isSucesso());
-        assertEquals(Perfis.ATENDENTE, resultado.getUsuario().getPerfil());
+        assertEquals(Atendente.INSTANCIA, resultado.getUsuario().getPerfil());
         assertFalse(resultado.getUsuario().getPerfil().podeAdministrar());
     }
 
@@ -90,7 +92,7 @@ class AutenticacaoServiceTest {
     @DisplayName("Usuário desautorizado deixa de iniciar sessão")
     void usuarioDesautorizadoNaoIniciaSessao() {
         Usuario usuario = new Usuario("Ana Lima", "analima",
-                SenhaUtil.hashSenha("Ana12345"), Perfis.ATENDENTE, Situacoes.AUTORIZADO);
+                SenhaUtil.hashSenha("Ana12345"), Atendente.INSTANCIA, Autorizado.INSTANCIA);
         usuarioRepository.salvar(usuario);
 
         assertTrue(autenticacaoService.autenticar("analima", "Ana12345").isSucesso());

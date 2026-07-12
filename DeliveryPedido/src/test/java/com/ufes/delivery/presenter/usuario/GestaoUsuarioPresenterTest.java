@@ -2,8 +2,11 @@ package com.ufes.delivery.presenter.usuario;
 
 import com.ufes.delivery.apoio.GestaoUsuarioViewStub;
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
+import com.ufes.delivery.model.situacao.Autorizado;
+import com.ufes.delivery.model.situacao.NaoAutorizado;
+import com.ufes.delivery.model.situacao.Pendente;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.repository.usuario.UsuarioRepositoryEmMemoria;
 import com.ufes.delivery.service.SessaoService;
@@ -15,10 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("US03 - Gerenciar usuários e autorizações")
 class GestaoUsuarioPresenterTest {
@@ -48,7 +48,7 @@ class GestaoUsuarioPresenterTest {
     @DisplayName("Cenário 2 - Buscar usuário por nome, sem diferenciar maiúsculas de minúsculas")
     void buscaUsuarioPorNome() {
         usuarioRepository.salvar(new Usuario("Fulano de Tal", "fulano123",
-                SenhaUtil.hashSenha("Fulano12"), Perfis.ATENDENTE, Situacoes.PENDENTE));
+                SenhaUtil.hashSenha("Fulano12"), Atendente.INSTANCIA, Pendente.INSTANCIA));
 
         view.setTermoBusca("FULANO");
         presenter.onBuscar();
@@ -69,14 +69,14 @@ class GestaoUsuarioPresenterTest {
     @DisplayName("Cenário 3 - Autorizar vários usuários selecionados")
     void autorizaVariosUsuarios() {
         usuarioRepository.salvar(new Usuario("Pedro Alves", "pedro01",
-                SenhaUtil.hashSenha("Pedro123"), Perfis.ATENDENTE, Situacoes.PENDENTE));
+                SenhaUtil.hashSenha("Pedro123"), Atendente.INSTANCIA, Pendente.INSTANCIA));
 
         view.setSelecionados(List.of("maria01", "pedro01"));
         presenter.onAutorizar();
 
-        assertEquals(Situacoes.AUTORIZADO,
+        assertEquals(Autorizado.INSTANCIA,
                 usuarioRepository.buscarPorNomeUsuario("maria01").orElseThrow().getSituacao());
-        assertEquals(Situacoes.AUTORIZADO,
+        assertEquals(Autorizado.INSTANCIA,
                 usuarioRepository.buscarPorNomeUsuario("pedro01").orElseThrow().getSituacao());
         assertEquals("Autorizado", view.getSituacaoNaTabela("maria01"));
         assertEquals("Autorizado", view.getSituacaoNaTabela("pedro01"));
@@ -89,7 +89,7 @@ class GestaoUsuarioPresenterTest {
         presenter.onDesautorizar();
 
         Usuario atendente = usuarioRepository.buscarPorNomeUsuario("atendente01").orElseThrow();
-        assertEquals(Situacoes.NAO_AUTORIZADO, atendente.getSituacao());
+        assertEquals(NaoAutorizado.INSTANCIA, atendente.getSituacao());
         assertFalse(atendente.isAutorizado());
         assertFalse(atendente.getSituacao().podeIniciarSessao());
     }
@@ -101,7 +101,7 @@ class GestaoUsuarioPresenterTest {
         presenter.onAutorizar();
 
         assertEquals("Selecione ao menos um usuário.", view.getMensagemErro());
-        assertEquals(Situacoes.PENDENTE,
+        assertEquals(Pendente.INSTANCIA,
                 usuarioRepository.buscarPorNomeUsuario("maria01").orElseThrow().getSituacao());
     }
 
@@ -160,7 +160,7 @@ class GestaoUsuarioPresenterTest {
     void alteraPerfilParaValorDoDominio() {
         presenter.onPerfilAlterado("atendente01", "Administrador");
 
-        assertEquals(Perfis.ADMINISTRADOR,
+        assertEquals(Administrador.INSTANCIA,
                 usuarioRepository.buscarPorNomeUsuario("atendente01").orElseThrow().getPerfil());
     }
 }

@@ -3,10 +3,12 @@ package com.ufes.delivery.presenter.usuario;
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.delivery.model.Usuario;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
 import com.ufes.delivery.model.perfil.Perfil;
-import com.ufes.delivery.model.perfil.Perfis;
+import com.ufes.delivery.model.situacao.Autorizado;
+import com.ufes.delivery.model.situacao.Pendente;
 import com.ufes.delivery.model.situacao.Situacao;
-import com.ufes.delivery.model.situacao.Situacoes;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.util.SenhaUtil;
 import com.ufes.delivery.view.usuario.ICadastroUsuarioView;
@@ -94,11 +96,11 @@ public class CadastroUsuarioPresenter {
         Situacao situacao;
 
         if (!usuarioRepository.existeUsuario()) {
-            perfil = Perfis.ADMINISTRADOR;
-            situacao = Situacoes.AUTORIZADO;
+            perfil = Administrador.INSTANCIA;
+            situacao = Autorizado.INSTANCIA;
         } else {
-            perfil = Perfis.ATENDENTE;
-            situacao = Situacoes.PENDENTE;
+            perfil = Atendente.INSTANCIA;
+            situacao = Pendente.INSTANCIA;
         }
 
         String senhaHash = SenhaUtil.hashSenha(senha);

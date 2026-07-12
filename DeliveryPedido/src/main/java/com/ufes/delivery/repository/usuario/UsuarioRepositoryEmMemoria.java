@@ -1,15 +1,14 @@
 package com.ufes.delivery.repository.usuario;
 
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
+import com.ufes.delivery.model.situacao.Autorizado;
+import com.ufes.delivery.model.situacao.NaoAutorizado;
+import com.ufes.delivery.model.situacao.Pendente;
 import com.ufes.delivery.util.SenhaUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class UsuarioRepositoryEmMemoria implements IUsuarioRepository {
 
@@ -22,19 +21,19 @@ public class UsuarioRepositoryEmMemoria implements IUsuarioRepository {
     private void carregarUsuariosDeTeste() {
         salvar(new Usuario("Administrador Master", "adminmaster",
                 SenhaUtil.hashSenha("Admin123"),
-                Perfis.ADMINISTRADOR, Situacoes.AUTORIZADO));
+                Administrador.INSTANCIA, Autorizado.INSTANCIA));
 
         salvar(new Usuario("Carlos Atendente", "atendente01",
                 SenhaUtil.hashSenha("Atende01"),
-                Perfis.ATENDENTE, Situacoes.AUTORIZADO));
+                Atendente.INSTANCIA, Autorizado.INSTANCIA));
 
         salvar(new Usuario("Maria Oliveira", "maria01",
                 SenhaUtil.hashSenha("Maria123"),
-                Perfis.ATENDENTE, Situacoes.PENDENTE));
+                Atendente.INSTANCIA, Pendente.INSTANCIA));
 
         salvar(new Usuario("Joao Silva", "joaosilva",
                 SenhaUtil.hashSenha("Joao1234"),
-                Perfis.ATENDENTE, Situacoes.NAO_AUTORIZADO));
+                Atendente.INSTANCIA, NaoAutorizado.INSTANCIA));
     }
 
     @Override

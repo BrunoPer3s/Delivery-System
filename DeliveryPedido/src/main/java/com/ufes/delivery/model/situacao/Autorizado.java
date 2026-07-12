@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.situacao;
 
-public final class Autorizado implements Situacao {
+public final class Autorizado extends Situacao {
 
     public static final Autorizado INSTANCIA = new Autorizado();
 
-    private Autorizado() {}
-
-    @Override
-    public String getDescricao() {
-        return "Autorizado";
+    private Autorizado() {
+        todasSituacoes(INSTANCIA);
     }
 
     @Override
