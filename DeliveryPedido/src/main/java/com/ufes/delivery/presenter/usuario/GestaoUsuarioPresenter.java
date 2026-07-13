@@ -1,7 +1,9 @@
 package com.ufes.delivery.presenter.usuario;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.Usuario;
 import com.ufes.delivery.model.perfil.Perfil;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
@@ -59,7 +61,8 @@ public class GestaoUsuarioPresenter {
                 usuario.autorizar();
                 usuarioRepository.salvar(usuario);
             });
-            registrarAuditoria("Autorização de usuário: " + nomeUsuario);
+            registrarAuditoria("Autorização de usuário", "Usuário " + nomeUsuario,
+                    ResultadoOperacao.SUCESSO, "Decisão administrativa");
         }
 
         view.exibirMensagemInfo(selecionados.size() + " usuário(s) autorizado(s).");
@@ -87,7 +90,8 @@ public class GestaoUsuarioPresenter {
                 usuario.desautorizar();
                 usuarioRepository.salvar(usuario);
             });
-            registrarAuditoria("Desautorização de usuário: " + nomeUsuario);
+            registrarAuditoria("Desautorização de usuário", "Usuário " + nomeUsuario,
+                    ResultadoOperacao.SUCESSO, "Decisão administrativa");
         }
 
         view.exibirMensagemInfo(selecionados.size() + " usuário(s) desautorizado(s).");
@@ -116,7 +120,8 @@ public class GestaoUsuarioPresenter {
 
         for (String nomeUsuario : selecionados) {
             usuarioRepository.remover(nomeUsuario);
-            registrarAuditoria("Exclusão de usuário: " + nomeUsuario);
+            registrarAuditoria("Exclusão de usuário", "Usuário " + nomeUsuario,
+                    ResultadoOperacao.SUCESSO, "Decisão administrativa");
         }
 
         view.exibirMensagemInfo(selecionados.size() + " usuário(s) excluído(s).");
@@ -148,8 +153,8 @@ public class GestaoUsuarioPresenter {
             Perfil perfil = Perfil.porDescricao(novoPerfil);
             usuario.setPerfil(perfil);
             usuarioRepository.salvar(usuario);
-            registrarAuditoria("Alteração de perfil de " + nomeUsuario +
-                    " para " + perfil.getDescricao());
+            registrarAuditoria("Alteração de perfil", "Usuário " + nomeUsuario,
+                    ResultadoOperacao.SUCESSO, "Novo perfil: " + perfil.getDescricao());
         });
     }
 
@@ -172,15 +177,19 @@ public class GestaoUsuarioPresenter {
         return dados;
     }
 
-    private void registrarAuditoria(String operacao) {
+    private void registrarAuditoria(String operacao, String recurso,
+                                     ResultadoOperacao resultado, String justificativa) {
         if (logger != null) {
             try {
                 String usuario = sessaoService.getNomeUsuarioLogado();
-                logger.registrar(
-                    MensagemLogFactory.criarParaOperacao(
-                        usuario != null ? usuario : "sistema", operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+                logger.registrar(MensagemLogFactory.operacao(operacao)
+                        .recurso(recurso)
+                        .resultado(resultado)
+                        .justificativa(justificativa)
+                        .paraUsuario(usuario != null ? usuario : "sistema"));
+            } catch (LogIndisponivelException e) {
+                view.exibirMensagemErro(
+                        "A operação foi concluída, mas o registro de auditoria falhou.");
             }
         }
     }

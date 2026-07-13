@@ -1,7 +1,9 @@
 package com.ufes.delivery.presenter.usuario;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.Usuario;
 import com.ufes.delivery.model.perfil.Administrador;
 import com.ufes.delivery.model.perfil.Atendente;
@@ -108,8 +110,7 @@ public class CadastroUsuarioPresenter {
         usuarioRepository.salvar(novoUsuario);
 
         registrarAuditoria(nomeUsuario,
-            "Cadastro de usuário - Perfil: " + perfil.getDescricao() +
-            ", Situação: " + situacao.getDescricao());
+            "Perfil " + perfil.getDescricao() + ", situação " + situacao.getDescricao());
 
         String mensagemSucesso;
         if (situacao.podeIniciarSessao()) {
@@ -132,13 +133,17 @@ public class CadastroUsuarioPresenter {
         view.fechar();
     }
 
-    private void registrarAuditoria(String nomeUsuario, String operacao) {
+    private void registrarAuditoria(String nomeUsuario, String justificativa) {
         if (logger != null) {
             try {
-                logger.registrar(
-                    MensagemLogFactory.criarParaOperacao(nomeUsuario, operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+                logger.registrar(MensagemLogFactory.operacao("Cadastro de usuário")
+                        .recurso("Usuário " + nomeUsuario)
+                        .resultado(ResultadoOperacao.SUCESSO)
+                        .justificativa(justificativa)
+                        .paraUsuario(nomeUsuario));
+            } catch (LogIndisponivelException e) {
+                view.exibirMensagemErro(
+                        "O cadastro foi concluído, mas o registro de auditoria falhou.");
             }
         }
     }

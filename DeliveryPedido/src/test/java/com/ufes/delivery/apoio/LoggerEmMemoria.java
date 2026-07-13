@@ -19,11 +19,23 @@ public class LoggerEmMemoria implements ILogger {
         return registros;
     }
 
-    public String getUltimaOperacao() {
+    public MensagemLog getUltimo() {
         if (registros.isEmpty()) {
             return null;
         }
-        return registros.get(registros.size() - 1).getNomeOperacao();
+        return registros.get(registros.size() - 1);
+    }
+
+    public String getUltimaOperacao() {
+        return registros.isEmpty() ? null : getUltimo().getNomeOperacao();
+    }
+
+    public String getUltimoRecurso() {
+        return registros.isEmpty() ? null : getUltimo().getRecurso();
+    }
+
+    public String getUltimaJustificativa() {
+        return registros.isEmpty() ? null : getUltimo().getJustificativa();
     }
 
     public boolean vazio() {

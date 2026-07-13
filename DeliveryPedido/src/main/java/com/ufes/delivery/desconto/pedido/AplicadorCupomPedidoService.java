@@ -1,6 +1,8 @@
 package com.ufes.delivery.desconto.pedido;
 
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.delivery.log.ResultadoOperacao;
+import com.ufes.delivery.util.UsuarioLogadoService;
 import com.ufes.delivery.model.CupomDescontoPedido;
 import com.ufes.delivery.model.Pedido;
 import com.ufes.delivery.repository.cupom.ICupomRepository;
@@ -52,7 +54,12 @@ public class AplicadorCupomPedidoService {
         pedido.setCupomAplicado(cupom);
 
         if (logger != null) {
-            logger.registrar(MensagemLogFactory.criar(pedido, "Aplicação de cupom de desconto no valor total do pedido", "aplicarCupom"));
+            logger.registrar(MensagemLogFactory.operacao("Aplicação de cupom")
+                    .pedido(pedido)
+                    .recurso("Cupom " + codigoCupom)
+                    .resultado(ResultadoOperacao.SUCESSO)
+                    .justificativa("Desconto de " + cupom.getPercentual() + "% no total do pedido")
+                    .paraUsuario(UsuarioLogadoService.getNomeUsuario()));
         }
     }
 }

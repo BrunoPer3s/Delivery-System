@@ -1,7 +1,9 @@
 package com.ufes.delivery.presenter.cliente;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.Cliente;
 import com.ufes.delivery.model.Endereco;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
@@ -168,10 +170,11 @@ public class CadastroClientePresenter {
             }
             clienteRepository.salvar(cliente);
 
-            String operacao = clienteEdicao != null
-                    ? "Edição de cliente: " + cliente.getNome()
-                    : "Cadastro de cliente: " + cliente.getNome();
-            registrarAuditoria(operacao);
+            registrarAuditoria(
+                    clienteEdicao != null ? "Edição de cliente" : "Cadastro de cliente",
+                    "Cliente " + cliente.getCpfFormatado() + " - " + cliente.getNome(),
+                    ResultadoOperacao.SUCESSO,
+                    "");
 
             view.exibirMensagemSucesso("Cliente salvo com sucesso!");
             view.fechar();
@@ -185,14 +188,19 @@ public class CadastroClientePresenter {
         view.fechar();
     }
 
-    private void registrarAuditoria(String operacao) {
+    private void registrarAuditoria(String operacao, String recurso,
+                                     ResultadoOperacao resultado, String justificativa) {
         if (logger != null) {
             try {
                 String usuario = sessaoService.getNomeUsuarioLogado();
-                logger.registrar(MensagemLogFactory.criarParaOperacao(
-                    usuario != null ? usuario : "sistema", operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+                logger.registrar(MensagemLogFactory.operacao(operacao)
+                        .recurso(recurso)
+                        .resultado(resultado)
+                        .justificativa(justificativa)
+                        .paraUsuario(usuario != null ? usuario : "sistema"));
+            } catch (LogIndisponivelException e) {
+                view.exibirMensagemErro(
+                        "A operação foi concluída, mas o registro de auditoria falhou.");
             }
         }
     }

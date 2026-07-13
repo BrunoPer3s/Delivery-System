@@ -1,0 +1,5 @@
+jdk:
+  - openjdk21
+install:
+  - mvn install -N -DskipTests
+  - mvn install -f log-auditoria/pom.xml -DskipTests

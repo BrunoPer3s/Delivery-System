@@ -1,7 +1,9 @@
 package com.ufes.delivery.presenter.produto;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.Produto;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.service.SessaoService;
@@ -46,7 +48,8 @@ public class CadastroProdutoPresenter {
     public void onSalvar() {
         if (!sessaoService.isAdministrador()) {
             view.exibirMensagemErro("Cadastro de produto é restrito ao Administrador.");
-            registrarAuditoria("Acesso negado - tentativa de cadastro de produto sem perfil Administrador");
+            registrarAuditoria("Cadastro de produto", "Produto", ResultadoOperacao.REJEITADO,
+                    "Acesso negado - perfil sem permissão administrativa");
             return;
         }
 
@@ -141,16 +144,16 @@ public class CadastroProdutoPresenter {
                 produto.setNome(nome.trim());
                 produto.setCategoria(categoria);
                 produto.setPrecoUnitario(preco);
-                operacao = "Edição de produto: " + produto.getCodigo()
-                         + " - " + produto.getNome();
+                operacao = "Edição de produto";
             } else {
                 produto = new Produto(codigo, nome.trim(), categoria,
                                        preco, estoqueInicial);
-                operacao = "Cadastro de produto: " + produto.getCodigo()
-                         + " - " + produto.getNome();
+                operacao = "Cadastro de produto";
             }
             produtoRepository.salvar(produto);
-            registrarAuditoria(operacao);
+            registrarAuditoria(operacao,
+                    "Produto " + produto.getCodigo() + " - " + produto.getNome(),
+                    ResultadoOperacao.SUCESSO, "");
 
             view.exibirMensagemSucesso("Produto salvo com sucesso!");
             view.fechar();
@@ -164,14 +167,19 @@ public class CadastroProdutoPresenter {
         view.fechar();
     }
 
-    private void registrarAuditoria(String operacao) {
+    private void registrarAuditoria(String operacao, String recurso,
+                                     ResultadoOperacao resultado, String justificativa) {
         if (logger != null) {
             try {
                 String usuario = sessaoService.getNomeUsuarioLogado();
-                logger.registrar(MensagemLogFactory.criarParaOperacao(
-                    usuario != null ? usuario : "sistema", operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+                logger.registrar(MensagemLogFactory.operacao(operacao)
+                        .recurso(recurso)
+                        .resultado(resultado)
+                        .justificativa(justificativa)
+                        .paraUsuario(usuario != null ? usuario : "sistema"));
+            } catch (LogIndisponivelException e) {
+                view.exibirMensagemErro(
+                        "A operação foi concluída, mas o registro de auditoria falhou.");
             }
         }
     }
