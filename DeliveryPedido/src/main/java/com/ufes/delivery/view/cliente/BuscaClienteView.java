@@ -119,7 +119,7 @@ public class BuscaClienteView extends JFrame implements IBuscaClienteView {
 
     @Override
     public String getTipoBusca() {
-        return (String) cmbTipoBusca.getSelectedItem();
+        return "Cliente " + cmbTipoBusca.getSelectedItem();
     }
 
     @Override
@@ -177,7 +177,6 @@ public class BuscaClienteView extends JFrame implements IBuscaClienteView {
         @Override public int getColumnCount() { return COLUNAS.length; }
         @Override public String getColumnName(int col) { return COLUNAS[col]; }
         @Override public Object getValueAt(int row, int col) { return dados.get(row)[col]; }
-        @Override public boolean isCellEditable(int row, int col) { return false; }
     }
 }
 
