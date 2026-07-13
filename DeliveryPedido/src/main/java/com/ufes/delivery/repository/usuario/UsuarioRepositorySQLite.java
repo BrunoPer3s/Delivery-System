@@ -14,6 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/*
+ * Optamos pelo uso de Injeção de Dependência aqui via construtor público.
+ * Além de dessa forma permitir que em atualizações futuras haja alteração
+ * do tipo de banco de dados sem que tenha que ocorrer refatoração de codigo
+ * em local diferente da classe BancoDados respeitando os princípios SOLID
+ * (especialmente o DIP), a Injeção de Dependência permite que o repositório
+ * seja gerenciado externamente e garante que cada teste possa criar cada um
+ *  sua instanciar
+ */
+
 public class UsuarioRepositorySQLite implements IUsuarioRepository {
 
     private final BancoDados banco;

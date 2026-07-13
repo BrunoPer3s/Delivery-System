@@ -5,6 +5,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/*
+ * Optamos pelo não uso da implementação do padrão Singleton de forma proposital.
+ * Fizemos a instanciação de forma unica na classe main DeliveryApplication e a
+ * ideia de manter o construtor público garante que a classe não tenha um estado
+ * global.
+ * Com o Singleton, para os testes seria necessario o uso de @AfterEach e isso
+ * levaria também a criacao
+ */
+
 public class BancoDados {
 
     private static final String ARQUIVO_PADRAO = "delivery.db";
