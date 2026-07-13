@@ -5,6 +5,7 @@ import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
+import com.ufes.delivery.repository.pedido.PedidoRegistro;
 import com.ufes.delivery.repository.pedido.TransicaoEstadoPedido;
 
 import javax.swing.*;
@@ -36,7 +37,7 @@ public class SimuladorCicloPedidoService {
         timer.stop();
     }
 
-    private void avancarCiclo() {
+    public void avancarCiclo() {
         List<TransicaoEstadoPedido> transicoes = pedidoRepository.avancarEstadosPendentes();
         for (TransicaoEstadoPedido transicao : transicoes) {
             registrarAuditoria(transicao);
@@ -49,8 +50,11 @@ public class SimuladorCicloPedidoService {
         }
         try {
             String usuario = sessaoService.getNomeUsuarioLogado();
+            String nomeCliente = pedidoRepository.buscarPorCodigo(transicao.codigoPedido())
+                    .map(PedidoRegistro::getNomeCliente)
+                    .orElse("");
             logger.registrar(MensagemLogFactory.operacao("Transição de estado do pedido")
-                    .pedido(transicao.codigoPedido(), "")
+                    .pedido(transicao.codigoPedido(), nomeCliente)
                     .recurso("Pedido " + transicao.codigoPedido())
                     .resultado(ResultadoOperacao.SUCESSO)
                     .justificativa(transicao.estadoAnterior() + " -> " + transicao.estadoNovo())

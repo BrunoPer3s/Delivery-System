@@ -3,7 +3,11 @@ package com.ufes.delivery.log;
 import com.ufes.delivery.apoio.CadastroUsuarioViewStub;
 import com.ufes.delivery.apoio.GestaoUsuarioViewStub;
 import com.ufes.delivery.apoio.LoggerEmMemoria;
+import com.ufes.delivery.model.estado.AguardandoEntrega;
 import com.ufes.delivery.persistencia.BancoDados;
+import com.ufes.delivery.repository.pedido.PedidoRegistro;
+import com.ufes.delivery.repository.pedido.PedidoRepositoryEmMemoria;
+import com.ufes.delivery.service.SimuladorCicloPedidoService;
 import com.ufes.delivery.presenter.usuario.CadastroUsuarioPresenter;
 import com.ufes.delivery.presenter.usuario.GestaoUsuarioPresenter;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
@@ -153,6 +157,22 @@ class AuditoriaTest {
 
         String hash = usuarioRepository.buscarPorNomeUsuario("bruno01").orElseThrow().getSenhaHash();
         assertFalse(registro.toString().contains(hash));
+    }
+
+    @Test
+    @DisplayName("A transição automática de estado registra o cliente do pedido")
+    void transicaoAutomaticaRegistraOCliente() {
+        PedidoRepositoryEmMemoria pedidoRepository = new PedidoRepositoryEmMemoria();
+        pedidoRepository.registrar(new PedidoRegistro(1001, "Fulano de Tal",
+                "13/07/2026", null, AguardandoEntrega.INSTANCIA, "R$ 100,00"));
+
+        new SimuladorCicloPedidoService(pedidoRepository, gerenciador, sessaoService)
+                .avancarCiclo();
+
+        MensagemLog registro = ultimo();
+        assertEquals("Transição de estado do pedido", registro.getNomeOperacao());
+        assertEquals("1001", registro.getCodigoPedido());
+        assertEquals("Fulano de Tal", registro.getNomeCliente());
     }
 
     @Test

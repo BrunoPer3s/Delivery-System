@@ -322,7 +322,7 @@ public class PedidoPresenter {
             return;
         }
 
-        reconstruirPedido();
+        reconstruirPedido(true);
 
         String resumo = "Confirmar pagamento do pedido #" + pedido.getCodigo() + "?\n\n"
                 + "Cliente: " + clienteSelecionado.getNome() + "\n"
@@ -471,6 +471,10 @@ public class PedidoPresenter {
 
 
     private void reconstruirPedido() {
+        reconstruirPedido(false);
+    }
+
+    private void reconstruirPedido(boolean auditarCalculo) {
         if (clienteSelecionado == null) {
             pedido = null;
             atualizarTotais();
@@ -485,7 +489,7 @@ public class PedidoPresenter {
 
         try {
             CalculadoraTaxaDescontoPedidoService calculadora =
-                    new CalculadoraTaxaDescontoPedidoService(logger);
+                    new CalculadoraTaxaDescontoPedidoService(auditarCalculo ? logger : null);
             calculadora.calcularDesconto(pedido);
         } catch (Exception e) {
             System.err.println("Erro ao calcular descontos de taxa: " + e.getMessage());
