@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.situacao;
 
-public final class NaoAutorizado implements Situacao {
+public final class NaoAutorizado extends Situacao {
 
     public static final NaoAutorizado INSTANCIA = new NaoAutorizado();
 
-    private NaoAutorizado() {}
-
-    @Override
-    public String getDescricao() {
-        return "Nao autorizado";
+    private NaoAutorizado() {
+        super("Nao autorizado");
     }
 
     @Override

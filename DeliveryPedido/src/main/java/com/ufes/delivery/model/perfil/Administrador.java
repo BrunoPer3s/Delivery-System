@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.perfil;
 
-public final class Administrador implements Perfil {
+public final class Administrador extends Perfil {
 
     public static final Administrador INSTANCIA = new Administrador();
 
-    private Administrador() {}
-
-    @Override
-    public String getDescricao() {
-        return "Administrador";
+    private Administrador() {
+        super("Administrador");
     }
 
     @Override

@@ -1,10 +1,11 @@
 package com.ufes.delivery.model;
 
 import com.ufes.delivery.configuracao.ConfiguracaoService;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class Pedido {

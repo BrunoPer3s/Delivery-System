@@ -2,8 +2,9 @@ package com.ufes.delivery.desconto.taxa.entrega;
 
 import com.ufes.delivery.model.CupomDescontoEntrega;
 import com.ufes.delivery.model.Pedido;
-import java.util.Map;
+
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class FormaDescontoTaxaPorTipoCliente implements IFormaDescontoTaxaEntrega {

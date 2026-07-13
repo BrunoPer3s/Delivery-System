@@ -2,8 +2,10 @@ package com.ufes.delivery.presenter.usuario;
 
 import com.ufes.delivery.apoio.CadastroUsuarioViewStub;
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
+import com.ufes.delivery.model.situacao.Autorizado;
+import com.ufes.delivery.model.situacao.Pendente;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.repository.usuario.IUsuarioRepository;
 import com.ufes.delivery.repository.usuario.UsuarioRepositorySQLite;
@@ -15,10 +17,14 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
+/*
+* Neste cenário, são necessárias validações estruturais de persistencia dos dados, como o Cenário 3, por exemplo.
+* Por isso, optamos pelo uso real do banco UsuarioRepositorySQLite e, para não afetar a aplicação, fizemos uso
+* do mecanismo @TempDir do JUnit, que cria o banco de dados numa pasta temporária mantida apenas
+* durante a execução deste cenário de testes e depois deletada, sem afetar os dados reais da aplicação
+ */
 
 @DisplayName("US02 - Cadastrar usuário")
 class CadastroUsuarioPresenterTest {
@@ -55,8 +61,8 @@ class CadastroUsuarioPresenterTest {
         assertNotNull(view.getMensagemSucesso());
 
         Usuario primeiro = usuarioRepository.buscarPorNomeUsuario("bruno01").orElseThrow();
-        assertEquals(Perfis.ADMINISTRADOR, primeiro.getPerfil());
-        assertEquals(Situacoes.AUTORIZADO, primeiro.getSituacao());
+        assertEquals(Administrador.INSTANCIA, primeiro.getPerfil());
+        assertEquals(Autorizado.INSTANCIA, primeiro.getSituacao());
         assertTrue(primeiro.isAutorizado());
     }
 
@@ -70,8 +76,8 @@ class CadastroUsuarioPresenterTest {
         assertNotNull(view.getMensagemSucesso());
 
         Usuario posterior = usuarioRepository.buscarPorNomeUsuario("maria02").orElseThrow();
-        assertEquals(Perfis.ATENDENTE, posterior.getPerfil());
-        assertEquals(Situacoes.PENDENTE, posterior.getSituacao());
+        assertEquals(Atendente.INSTANCIA, posterior.getPerfil());
+        assertEquals(Pendente.INSTANCIA, posterior.getSituacao());
         assertFalse(posterior.isAutorizado());
     }
 
@@ -92,7 +98,7 @@ class CadastroUsuarioPresenterTest {
     @DisplayName("Cenário 3 - Um nome de usuário pendente também bloqueia a duplicidade")
     void nomeUsuarioPendenteBloqueiaDuplicidade() {
         usuarioRepository.salvar(new Usuario("Maria Oliveira", "maria01",
-                SenhaUtil.hashSenha("Maria123"), Perfis.ATENDENTE, Situacoes.PENDENTE));
+                SenhaUtil.hashSenha("Maria123"), Atendente.INSTANCIA, Pendente.INSTANCIA));
 
         CadastroUsuarioViewStub view = cadastrar("Maria Souza", "maria01", "Senha456");
 

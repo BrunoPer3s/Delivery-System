@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.estado;
 
-public final class EmPreparo implements EstadoPedido {
+public final class EmPreparo extends EstadoPedido {
 
     public static final EmPreparo INSTANCIA = new EmPreparo();
 
-    private EmPreparo() {}
-
-    @Override
-    public String getNome() {
-        return "Em preparo";
+    private EmPreparo() {
+        super("Em preparo");
     }
 
     @Override

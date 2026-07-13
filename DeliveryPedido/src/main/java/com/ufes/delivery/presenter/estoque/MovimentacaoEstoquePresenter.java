@@ -197,23 +197,33 @@ public class MovimentacaoEstoquePresenter {
             ajusteEfetivo = Math.abs(quantidade);
         }
 
-        int estoqueResultante = produtoSelecionado.getEstoqueAtual() + ajusteEfetivo;
+        Produto produto = produtoRepository
+                .buscarPorCodigo(produtoSelecionado.getCodigo())
+                .orElse(null);
+        if (produto == null) {
+            view.exibirMensagemErro("Produto não está mais cadastrado. Selecione-o novamente.");
+            return;
+        }
+        this.produtoSelecionado = produto;
+
+        int estoqueResultante = produto.getEstoqueAtual() + ajusteEfetivo;
         if (estoqueResultante < 0) {
             view.exibirMensagemErro(
                 "Movimentação resultaria em estoque negativo (" + estoqueResultante +
-                "). Estoque atual: " + produtoSelecionado.getEstoqueAtual() + ".");
+                "). Estoque atual: " + produto.getEstoqueAtual() + ".");
             return;
         }
 
         try {
-            produtoSelecionado.ajustarEstoque(ajusteEfetivo);
-            produtoRepository.salvar(produtoSelecionado);
+            produto.ajustarEstoque(ajusteEfetivo);
+            produtoRepository.salvar(produto);
 
             String descricao = String.format(
-                "Movimentação de estoque: %s | Produto: %d - %s | Qtd: %d | %s→%d%s",
+                "Movimentação de estoque: %s | Data: %s | Produto: %d - %s | Qtd: %d | %s→%d%s",
                 tipo,
-                produtoSelecionado.getCodigo(),
-                produtoSelecionado.getNome(),
+                dataMovimentacao.format(DATE_FORMATTER),
+                produto.getCodigo(),
+                produto.getNome(),
                 ajusteEfetivo,
                 isAjuste ? "Motivo: " + motivo.trim() + " | " : "",
                 estoqueResultante,
@@ -225,8 +235,8 @@ public class MovimentacaoEstoquePresenter {
                 "Estoque atualizado: " + estoqueResultante);
 
             view.setProdutoSelecionado(
-                produtoSelecionado.getNome(),
-                String.valueOf(produtoSelecionado.getEstoqueAtual()));
+                produto.getNome(),
+                String.valueOf(produto.getEstoqueAtual()));
             view.setEstoquePrevia("");
             onBuscarProduto();
 

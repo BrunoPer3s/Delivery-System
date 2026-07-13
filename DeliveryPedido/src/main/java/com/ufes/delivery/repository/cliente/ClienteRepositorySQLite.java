@@ -1,12 +1,11 @@
 package com.ufes.delivery.repository.cliente;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-import com.ufes.delivery.repository.SuporteObservadores;
-
 import com.ufes.delivery.model.Cliente;
 import com.ufes.delivery.model.Endereco;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.persistencia.PersistenciaException;
+import com.ufes.delivery.repository.RepositorioObserver;
+import com.ufes.delivery.repository.SuporteObservadores;
 import com.ufes.delivery.util.CpfUtil;
 
 import java.sql.Connection;

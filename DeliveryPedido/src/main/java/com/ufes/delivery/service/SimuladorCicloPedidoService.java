@@ -5,7 +5,7 @@ import com.ufes.delivery.log.MensagemLogFactory;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.pedido.TransicaoEstadoPedido;
 
-import javax.swing.Timer;
+import javax.swing.*;
 import java.util.List;
 
 public class SimuladorCicloPedidoService {

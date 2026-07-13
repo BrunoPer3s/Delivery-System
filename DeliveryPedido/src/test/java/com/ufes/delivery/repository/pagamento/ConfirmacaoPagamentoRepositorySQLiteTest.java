@@ -1,7 +1,7 @@
 package com.ufes.delivery.repository.pagamento;
 
 import com.ufes.delivery.model.Produto;
-import com.ufes.delivery.model.estado.EstadosPedido;
+import com.ufes.delivery.model.estado.AguardandoEntrega;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.repository.pedido.PedidoRegistro;
 import com.ufes.delivery.repository.pedido.PedidoRepositorySQLite;
@@ -18,9 +18,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("US11 DoD 3 - Aprovação, baixa de estoque e mudança de estado em transação única")
 class ConfirmacaoPagamentoRepositorySQLiteTest {
@@ -54,7 +52,7 @@ class ConfirmacaoPagamentoRepositorySQLiteTest {
 
     private PedidoRegistro pedidoAguardandoEntrega() {
         return new PedidoRegistro(PEDIDO, "Fulano de Tal", hoje(), null,
-                EstadosPedido.AGUARDANDO_ENTREGA, "R$ 140,30");
+                AguardandoEntrega.INSTANCIA, "R$ 140,30");
     }
 
     private List<Produto> produtosComBaixa() {
@@ -77,7 +75,7 @@ class ConfirmacaoPagamentoRepositorySQLiteTest {
         assertEquals(30, estoque(LIVRO));
 
         PedidoRegistro gravado = pedidoRepository.buscarPorCodigo(PEDIDO).orElseThrow();
-        assertEquals(EstadosPedido.AGUARDANDO_ENTREGA, gravado.getEstado());
+        assertEquals(AguardandoEntrega.INSTANCIA, gravado.getEstado());
     }
 
     @Test

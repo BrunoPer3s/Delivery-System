@@ -1,8 +1,7 @@
 package com.ufes.delivery.repository.cliente;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-
 import com.ufes.delivery.model.Cliente;
+import com.ufes.delivery.repository.RepositorioObserver;
 
 import java.util.List;
 import java.util.Optional;

@@ -3,11 +3,8 @@ package com.ufes.delivery.desconto.taxa.entrega;
 import com.ufes.delivery.model.CupomDescontoEntrega;
 import com.ufes.delivery.model.Item;
 import com.ufes.delivery.model.Pedido;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 
 public class FormaDescontoTipoItem implements IFormaDescontoTaxaEntrega {
     private Map<String, Double> descontosPorTipoItem;

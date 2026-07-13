@@ -1,8 +1,7 @@
 package com.ufes.delivery.repository.produto;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-
 import com.ufes.delivery.model.Produto;
+import com.ufes.delivery.repository.RepositorioObserver;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -84,7 +83,6 @@ public class ProdutoRepositoryEmMemoria implements IProdutoRepository {
         return new ArrayList<>(produtos.values());
     }
 
-
     @Override
     public void adicionarObservador(RepositorioObserver observador) {
         if (observador != null && !observadores.contains(observador)) {
@@ -103,4 +101,3 @@ public class ProdutoRepositoryEmMemoria implements IProdutoRepository {
         }
     }
 }
-

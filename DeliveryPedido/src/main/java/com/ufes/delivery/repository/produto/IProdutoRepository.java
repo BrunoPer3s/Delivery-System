@@ -1,8 +1,7 @@
 package com.ufes.delivery.repository.produto;
 
-import com.ufes.delivery.repository.RepositorioObserver;
-
 import com.ufes.delivery.model.Produto;
+import com.ufes.delivery.repository.RepositorioObserver;
 
 import java.util.List;
 import java.util.Optional;

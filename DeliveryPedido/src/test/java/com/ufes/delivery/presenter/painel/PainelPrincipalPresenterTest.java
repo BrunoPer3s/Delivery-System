@@ -2,11 +2,11 @@ package com.ufes.delivery.presenter.painel;
 
 import com.ufes.delivery.apoio.PainelPrincipalViewStub;
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.estado.EstadoPedido;
-import com.ufes.delivery.model.estado.EstadosPedido;
+import com.ufes.delivery.model.estado.*;
+import com.ufes.delivery.model.perfil.Administrador;
+import com.ufes.delivery.model.perfil.Atendente;
 import com.ufes.delivery.model.perfil.Perfil;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.situacao.Autorizado;
 import com.ufes.delivery.repository.pedido.IPedidoRepository;
 import com.ufes.delivery.repository.pedido.PedidoRegistro;
 import com.ufes.delivery.repository.pedido.PedidoRepositoryEmMemoria;
@@ -21,9 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("US04 - Acessar o painel operacional")
 class PainelPrincipalPresenterTest {
@@ -61,11 +59,11 @@ class PainelPrincipalPresenterTest {
 
     private void logarComo(Perfil perfil) {
         sessaoService.iniciarSessao(new Usuario("Usuario Teste", "usuario01",
-                SenhaUtil.hashSenha("Senha123"), perfil, Situacoes.AUTORIZADO));
+                SenhaUtil.hashSenha("Senha123"), perfil, Autorizado.INSTANCIA));
     }
 
     private void abrirPainel() {
-        logarComo(Perfis.ADMINISTRADOR);
+        logarComo(Administrador.INSTANCIA);
         new PainelPrincipalPresenter(view, null, null, null, null,
                 pedidoRepository, null, sessaoService, null);
     }
@@ -82,9 +80,9 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("Cenário 1 - A lista de pedidos considera somente a data de operação")
     void listaSomenteOsPedidosDaDataDeOperacao() {
-        registrar(1001, hoje(), null, EstadosPedido.NOVO);
-        registrar(1002, ontem(), null, EstadosPedido.EM_PREPARO);
-        registrar(1003, hoje(), null, EstadosPedido.EM_TRANSITO);
+        registrar(1001, hoje(), null, Novo.INSTANCIA);
+        registrar(1002, ontem(), null, EmPreparo.INSTANCIA);
+        registrar(1003, hoje(), null, EmTransito.INSTANCIA);
 
         abrirPainel();
 
@@ -94,9 +92,9 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("Cenário 1 - As métricas consideram somente a data de operação")
     void metricasIgnoramPedidosDeOutrasDatas() {
-        registrar(1001, hoje(), null, EstadosPedido.NOVO);
-        registrar(1002, ontem(), null, EstadosPedido.NOVO);
-        registrar(1003, ontem(), null, EstadosPedido.NOVO);
+        registrar(1001, hoje(), null, Novo.INSTANCIA);
+        registrar(1002, ontem(), null, Novo.INSTANCIA);
+        registrar(1003, ontem(), null, Novo.INSTANCIA);
 
         abrirPainel();
 
@@ -107,14 +105,14 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("Cenário 2 - Métricas coerentes com a lista: oito pedidos, dois Novos e dois Entregues")
     void metricasCoerentesComAListaDePedidos() {
-        registrar(1001, hoje(), null, EstadosPedido.NOVO);
-        registrar(1002, hoje(), null, EstadosPedido.NOVO);
-        registrar(1003, hoje(), null, EstadosPedido.AGUARDANDO_PAGAMENTO);
-        registrar(1004, hoje(), null, EstadosPedido.EM_PREPARO);
-        registrar(1005, hoje(), null, EstadosPedido.AGUARDANDO_ENTREGA);
-        registrar(1006, hoje(), null, EstadosPedido.EM_TRANSITO);
-        registrar(1007, hoje(), hoje(), EstadosPedido.ENTREGUE);
-        registrar(1008, hoje(), hoje(), EstadosPedido.ENTREGUE);
+        registrar(1001, hoje(), null, Novo.INSTANCIA);
+        registrar(1002, hoje(), null, Novo.INSTANCIA);
+        registrar(1003, hoje(), null, AguardandoPagamento.INSTANCIA);
+        registrar(1004, hoje(), null, EmPreparo.INSTANCIA);
+        registrar(1005, hoje(), null, AguardandoEntrega.INSTANCIA);
+        registrar(1006, hoje(), null, EmTransito.INSTANCIA);
+        registrar(1007, hoje(), hoje(), Entregue.INSTANCIA);
+        registrar(1008, hoje(), hoje(), Entregue.INSTANCIA);
 
         abrirPainel();
 
@@ -131,8 +129,8 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("Entregues hoje conta pela data de conclusão, não pela data do pedido")
     void entreguesHojeContaPelaDataDeConclusao() {
-        registrar(1001, ontem(), hoje(), EstadosPedido.ENTREGUE);
-        registrar(1002, hoje(), ontem(), EstadosPedido.ENTREGUE);
+        registrar(1001, ontem(), hoje(), Entregue.INSTANCIA);
+        registrar(1002, hoje(), ontem(), Entregue.INSTANCIA);
 
         abrirPainel();
 
@@ -142,7 +140,7 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("Um pedido entregue em outra data não conta em Entregues hoje")
     void pedidoEntregueEmOutraDataNaoContaHoje() {
-        registrar(1001, ontem(), ontem(), EstadosPedido.ENTREGUE);
+        registrar(1001, ontem(), ontem(), Entregue.INSTANCIA);
 
         abrirPainel();
 
@@ -163,7 +161,7 @@ class PainelPrincipalPresenterTest {
     @Test
     @DisplayName("O menu administrativo é habilitado apenas para o perfil Administrador")
     void menuAdministrativoRestritoAoAdministrador() {
-        logarComo(Perfis.ATENDENTE);
+        logarComo(Atendente.INSTANCIA);
         new PainelPrincipalPresenter(view, null, null, null, null,
                 pedidoRepository, null, sessaoService, null);
 

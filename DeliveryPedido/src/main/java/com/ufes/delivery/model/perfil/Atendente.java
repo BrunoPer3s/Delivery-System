@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.perfil;
 
-public final class Atendente implements Perfil {
+public final class Atendente extends Perfil {
 
     public static final Atendente INSTANCIA = new Atendente();
 
-    private Atendente() {}
-
-    @Override
-    public String getDescricao() {
-        return "Atendente";
+    private Atendente() {
+        super("Atendente");
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.ufes.delivery.repository.usuario;
 
 import com.ufes.delivery.model.Usuario;
-import com.ufes.delivery.model.perfil.Perfis;
-import com.ufes.delivery.model.situacao.Situacoes;
+import com.ufes.delivery.model.perfil.Perfil;
+import com.ufes.delivery.model.situacao.Situacao;
 import com.ufes.delivery.persistencia.BancoDados;
 import com.ufes.delivery.persistencia.PersistenciaException;
 
@@ -13,6 +13,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+/*
+ * Optamos pelo uso de Injeção de Dependência aqui via construtor público.
+ * Além de dessa forma permitir que em atualizações futuras haja alteração
+ * do tipo de banco de dados sem que tenha que ocorrer refatoração de codigo
+ * em local diferente da classe BancoDados respeitando os princípios SOLID
+ * (especialmente o DIP), a Injeção de Dependência permite que o repositório
+ * seja gerenciado externamente e garante que cada teste possa criar cada um
+ *  sua instanciar
+ */
 
 public class UsuarioRepositorySQLite implements IUsuarioRepository {
 
@@ -126,7 +136,7 @@ public class UsuarioRepositorySQLite implements IUsuarioRepository {
                 rs.getString("nome"),
                 rs.getString("nome_usuario"),
                 rs.getString("senha_hash"),
-                Perfis.porDescricao(rs.getString("perfil")),
-                Situacoes.porDescricao(rs.getString("situacao")));
+                Perfil.porDescricao(rs.getString("perfil")),
+                Situacao.porDescricao(rs.getString("situacao")));
     }
 }

@@ -1,16 +1,17 @@
-package com.ufes.delivery.busca;
+package com.ufes.delivery.busca.clienteEstrategias;
 
+import com.ufes.delivery.busca.BuscaInvalidaException;
+import com.ufes.delivery.busca.EstrategiaBusca;
 import com.ufes.delivery.model.Cliente;
 import com.ufes.delivery.repository.cliente.IClienteRepository;
-import com.ufes.delivery.util.CpfUtil;
 
 import java.util.List;
 
-public class BuscaClientePorCpf implements CriterioBuscaCliente {
+public class BuscaClientePorNome implements EstrategiaBusca<Cliente, IClienteRepository> {
 
     @Override
     public String getRotulo() {
-        return "CPF";
+        return "Nome";
     }
 
     @Override
@@ -19,13 +20,6 @@ public class BuscaClientePorCpf implements CriterioBuscaCliente {
         if (termo.isEmpty()) {
             throw new BuscaInvalidaException("O valor da busca é obrigatório.");
         }
-        if (!CpfUtil.validar(termo)) {
-            throw new BuscaInvalidaException("CPF inválido.");
-        }
-        String cpfLimpo = CpfUtil.removerMascara(termo);
-        return repositorio.buscarPorCpf(cpfLimpo)
-                .map(List::of)
-                .orElse(List.of());
+        return repositorio.buscarPorNome(termo);
     }
 }
-

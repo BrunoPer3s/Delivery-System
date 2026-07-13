@@ -18,12 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.ufes.delivery.apoio.CadastroClienteViewStub.enderecoValido;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("US06 - Cadastrar, editar e visualizar cliente")
 class CadastroClientePresenterTest {

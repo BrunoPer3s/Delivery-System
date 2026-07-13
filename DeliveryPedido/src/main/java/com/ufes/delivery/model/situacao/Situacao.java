@@ -1,12 +1,44 @@
 package com.ufes.delivery.model.situacao;
 
-public interface Situacao {
+import java.util.List;
 
-    String getDescricao();
+public abstract class Situacao {
 
-    boolean podeIniciarSessao();
+    private final String descricao;
 
-    Situacao autorizar();
+    protected Situacao(String descricao) {
+        this.descricao = descricao;
+    }
 
-    Situacao desautorizar();
+    public abstract boolean podeIniciarSessao();
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public Situacao autorizar() {
+        throw new IllegalStateException(
+                "Nao eh possivel alterar a situacao de " + descricao + " para autorizado");
+    }
+
+    public Situacao desautorizar() {
+        throw new IllegalStateException(
+                "Nao eh possivel alterar a situacao de " + descricao + " para desautorizado");
+    }
+
+    public static List<Situacao> todas() {
+        return List.of(
+                Autorizado.INSTANCIA,
+                Pendente.INSTANCIA,
+                NaoAutorizado.INSTANCIA);
+    }
+
+    public static Situacao porDescricao(String descricao) {
+        for (Situacao situacao : todas()) {
+            if (situacao.getDescricao().equals(descricao)) {
+                return situacao;
+            }
+        }
+        throw new IllegalArgumentException("Situacao desconhecida: " + descricao);
+    }
 }

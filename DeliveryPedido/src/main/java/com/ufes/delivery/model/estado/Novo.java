@@ -1,14 +1,11 @@
 package com.ufes.delivery.model.estado;
 
-public final class Novo implements EstadoPedido {
+public final class Novo extends EstadoPedido {
 
     public static final Novo INSTANCIA = new Novo();
 
-    private Novo() {}
-
-    @Override
-    public String getNome() {
-        return "Novo";
+    private Novo() {
+        super("Novo");
     }
 
     @Override

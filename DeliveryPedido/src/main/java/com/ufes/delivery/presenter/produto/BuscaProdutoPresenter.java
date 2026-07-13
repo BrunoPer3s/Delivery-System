@@ -1,12 +1,12 @@
 package com.ufes.delivery.presenter.produto;
 
 import com.ufes.delivery.busca.BuscaInvalidaException;
-import com.ufes.delivery.busca.CriterioBuscaProduto;
-import com.ufes.delivery.busca.CriteriosBuscaProduto;
+import com.ufes.delivery.busca.EstrategiaBusca;
+import com.ufes.delivery.busca.EstrategiasBuscasFactory;
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.model.Produto;
-import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.repository.RepositorioObserver;
+import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.service.SessaoService;
 import com.ufes.delivery.view.produto.CadastroProdutoView;
 import com.ufes.delivery.view.produto.IBuscaProdutoView;
@@ -52,9 +52,10 @@ public class BuscaProdutoPresenter implements RepositorioObserver {
             return;
         }
 
-        CriterioBuscaProduto criterio = CriteriosBuscaProduto.porRotulo(view.getTipoBusca());
-
         try {
+            EstrategiaBusca<Produto, IProdutoRepository> criterio =
+                    EstrategiasBuscasFactory.paraProduto(view.getTipoBusca());
+
             List<Produto> resultados = criterio.buscar(valor, produtoRepository);
             view.carregarResultados(converterParaDados(resultados));
             if (resultados.isEmpty()) {

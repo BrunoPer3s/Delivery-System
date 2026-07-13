@@ -1,12 +1,12 @@
 package com.ufes.delivery.presenter.cliente;
 
 import com.ufes.delivery.busca.BuscaInvalidaException;
-import com.ufes.delivery.busca.CriterioBuscaCliente;
-import com.ufes.delivery.busca.CriteriosBuscaCliente;
+import com.ufes.delivery.busca.EstrategiaBusca;
+import com.ufes.delivery.busca.EstrategiasBuscasFactory;
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
 import com.ufes.delivery.model.Cliente;
-import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.repository.RepositorioObserver;
+import com.ufes.delivery.repository.cliente.IClienteRepository;
 import com.ufes.delivery.service.SessaoService;
 import com.ufes.delivery.util.CpfUtil;
 import com.ufes.delivery.view.cliente.CadastroClienteView;
@@ -46,9 +46,10 @@ public class BuscaClientePresenter implements RepositorioObserver {
     }
 
     public void onBuscar() {
-        CriterioBuscaCliente criterio = CriteriosBuscaCliente.porRotulo(view.getTipoBusca());
-
         try {
+            EstrategiaBusca<Cliente, IClienteRepository> criterio =
+                    EstrategiasBuscasFactory.paraCliente(view.getTipoBusca());
+
             List<Cliente> resultados = criterio.buscar(view.getValorBusca(), clienteRepository);
             view.carregarResultados(converterParaDados(resultados));
             if (resultados.isEmpty()) {

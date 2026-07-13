@@ -1,8 +1,9 @@
 package com.ufes.delivery.log;
 
 import com.ufes.delivery.model.Pedido;
-import com.ufes.log.model.MensagemLog;
 import com.ufes.delivery.util.UsuarioLogadoService;
+import com.ufes.log.model.MensagemLog;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
