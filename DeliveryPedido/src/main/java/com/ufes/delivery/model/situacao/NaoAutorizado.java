@@ -5,7 +5,7 @@ public final class NaoAutorizado extends Situacao {
     public static final NaoAutorizado INSTANCIA = new NaoAutorizado();
 
     private NaoAutorizado() {
-        todasSituacoes(this);
+        super("Nao autorizado");
     }
 
     @Override

@@ -7,14 +7,22 @@ import com.ufes.delivery.repository.produto.IProdutoRepository;
 
 import java.util.List;
 
-public class BuscaProdutoPorCodigo extends EstrategiaBusca<Produto> {
+public class BuscaProdutoPorCodigo implements EstrategiaBusca<Produto, IProdutoRepository> {
 
     @Override
-    public List<Produto> buscar(String valor, Object repositorio) throws RuntimeException {
-        IProdutoRepository repo = (IProdutoRepository) repositorio;
+    public String getRotulo() {
+        return "Código";
+    }
+
+    @Override
+    public List<Produto> buscar(String valor, IProdutoRepository repositorio) {
+        String termo = valor == null ? "" : valor.trim();
+        if (termo.isEmpty()) {
+            throw new BuscaInvalidaException("O valor da busca é obrigatório.");
+        }
         try {
-            int codigo = Integer.parseInt(valor.trim());
-            return repo.buscarPorCodigo(codigo)
+            int codigo = Integer.parseInt(termo);
+            return repositorio.buscarPorCodigo(codigo)
                     .map(List::of)
                     .orElse(List.of());
         } catch (NumberFormatException e) {
@@ -22,4 +30,3 @@ public class BuscaProdutoPorCodigo extends EstrategiaBusca<Produto> {
         }
     }
 }
-

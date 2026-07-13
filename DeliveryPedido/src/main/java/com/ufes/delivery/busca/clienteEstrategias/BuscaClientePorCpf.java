@@ -8,11 +8,15 @@ import com.ufes.delivery.util.CpfUtil;
 
 import java.util.List;
 
-public class BuscaClientePorCpf extends EstrategiaBusca<Cliente> {
+public class BuscaClientePorCpf implements EstrategiaBusca<Cliente, IClienteRepository> {
 
     @Override
-    public List<Cliente> buscar(String valor, Object repositorio) {
-        IClienteRepository repo = (IClienteRepository) repositorio;
+    public String getRotulo() {
+        return "CPF";
+    }
+
+    @Override
+    public List<Cliente> buscar(String valor, IClienteRepository repositorio) {
         String termo = valor == null ? "" : valor.trim();
         if (termo.isEmpty()) {
             throw new BuscaInvalidaException("O valor da busca é obrigatório.");
@@ -21,9 +25,8 @@ public class BuscaClientePorCpf extends EstrategiaBusca<Cliente> {
             throw new BuscaInvalidaException("CPF inválido.");
         }
         String cpfLimpo = CpfUtil.removerMascara(termo);
-        return repo.buscarPorCpf(cpfLimpo)
+        return repositorio.buscarPorCpf(cpfLimpo)
                 .map(List::of)
                 .orElse(List.of());
     }
 }
-

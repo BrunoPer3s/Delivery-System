@@ -7,16 +7,19 @@ import com.ufes.delivery.repository.cliente.IClienteRepository;
 
 import java.util.List;
 
-public class BuscaClientePorNome extends EstrategiaBusca<Cliente> {
+public class BuscaClientePorNome implements EstrategiaBusca<Cliente, IClienteRepository> {
 
     @Override
-    public List<Cliente> buscar(String valor, Object repositorio) throws RuntimeException {
-        IClienteRepository repo = (IClienteRepository) repositorio;
+    public String getRotulo() {
+        return "Nome";
+    }
+
+    @Override
+    public List<Cliente> buscar(String valor, IClienteRepository repositorio) {
         String termo = valor == null ? "" : valor.trim();
         if (termo.isEmpty()) {
             throw new BuscaInvalidaException("O valor da busca é obrigatório.");
         }
-        return repo.buscarPorNome(termo);
+        return repositorio.buscarPorNome(termo);
     }
 }
-

@@ -5,7 +5,7 @@ public final class Atendente extends Perfil {
     public static final Atendente INSTANCIA = new Atendente();
 
     private Atendente() {
-        todosPerfis(this);
+        super("Atendente");
     }
 
     @Override

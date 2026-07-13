@@ -124,7 +124,7 @@ public class BuscaProdutoView extends JFrame implements IBuscaProdutoView {
 
     @Override
     public String getTipoBusca() {
-        return "Produto " + cmbTipoBusca.getSelectedItem();
+        return String.valueOf(cmbTipoBusca.getSelectedItem());
     }
 
     @Override

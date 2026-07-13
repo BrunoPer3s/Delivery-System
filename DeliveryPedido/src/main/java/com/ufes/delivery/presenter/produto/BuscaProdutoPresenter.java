@@ -52,9 +52,10 @@ public class BuscaProdutoPresenter implements RepositorioObserver {
             return;
         }
 
-        EstrategiaBusca<Produto> criterio = EstrategiasBuscasFactory.porRotulo(view.getTipoBusca());
-
         try {
+            EstrategiaBusca<Produto, IProdutoRepository> criterio =
+                    EstrategiasBuscasFactory.paraProduto(view.getTipoBusca());
+
             List<Produto> resultados = criterio.buscar(valor, produtoRepository);
             view.carregarResultados(converterParaDados(resultados));
             if (resultados.isEmpty()) {

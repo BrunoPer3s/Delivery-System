@@ -46,9 +46,10 @@ public class BuscaClientePresenter implements RepositorioObserver {
     }
 
     public void onBuscar() {
-        EstrategiaBusca<Cliente> criterio = EstrategiasBuscasFactory.porRotulo(view.getTipoBusca());
-
         try {
+            EstrategiaBusca<Cliente, IClienteRepository> criterio =
+                    EstrategiasBuscasFactory.paraCliente(view.getTipoBusca());
+
             List<Cliente> resultados = criterio.buscar(view.getValorBusca(), clienteRepository);
             view.carregarResultados(converterParaDados(resultados));
             if (resultados.isEmpty()) {

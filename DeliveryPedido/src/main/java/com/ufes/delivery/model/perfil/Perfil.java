@@ -1,28 +1,33 @@
 package com.ufes.delivery.model.perfil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Perfil {
 
-    private static final List<Perfil> TODOS = new ArrayList<>();
+    private final String descricao;
 
-    protected static void todosPerfis(Perfil instancia) {
-        TODOS.add(instancia);
+    protected Perfil(String descricao) {
+        this.descricao = descricao;
     }
 
+    public abstract boolean podeAdministrar();
+
     public String getDescricao() {
-        return this.getClass().getSimpleName();
+        return descricao;
+    }
+
+    public static List<Perfil> todos() {
+        return List.of(
+                Administrador.INSTANCIA,
+                Atendente.INSTANCIA);
     }
 
     public static Perfil porDescricao(String descricao) {
-        for (Perfil perfil : TODOS) {
+        for (Perfil perfil : todos()) {
             if (perfil.getDescricao().equals(descricao)) {
                 return perfil;
             }
         }
-        throw new IllegalArgumentException("Perfil " + descricao.toUpperCase() + " desconhecido");
+        throw new IllegalArgumentException("Perfil desconhecido: " + descricao);
     }
-
-    public abstract boolean podeAdministrar();
 }

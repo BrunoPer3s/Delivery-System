@@ -119,7 +119,7 @@ public class BuscaClienteView extends JFrame implements IBuscaClienteView {
 
     @Override
     public String getTipoBusca() {
-        return "Cliente " + cmbTipoBusca.getSelectedItem();
+        return String.valueOf(cmbTipoBusca.getSelectedItem());
     }
 
     @Override

@@ -1,40 +1,44 @@
 package com.ufes.delivery.model.situacao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Situacao {
 
-    private static final List<Situacao> TODAS = new ArrayList<>();
+    private final String descricao;
+
+    protected Situacao(String descricao) {
+        this.descricao = descricao;
+    }
 
     public abstract boolean podeIniciarSessao();
 
-    protected static void todasSituacoes(Situacao instancia) {
-        TODAS.add(instancia);
-    }
-
-    public  String getDescricao() {
-        return this.getClass().getSimpleName();
+    public String getDescricao() {
+        return descricao;
     }
 
     public Situacao autorizar() {
-        throw new IllegalStateException("Nao eh possivel alterar a situacao de " +
-                this.getClass().getSimpleName() +
-                "para autorizado");
+        throw new IllegalStateException(
+                "Nao eh possivel alterar a situacao de " + descricao + " para autorizado");
     }
 
     public Situacao desautorizar() {
-        throw new IllegalStateException("Nao eh possivel alterar a situacao de " +
-                                        this.getClass().getSimpleName() +
-                                        "para desautorizado");
+        throw new IllegalStateException(
+                "Nao eh possivel alterar a situacao de " + descricao + " para desautorizado");
+    }
+
+    public static List<Situacao> todas() {
+        return List.of(
+                Autorizado.INSTANCIA,
+                Pendente.INSTANCIA,
+                NaoAutorizado.INSTANCIA);
     }
 
     public static Situacao porDescricao(String descricao) {
-        for (Situacao situacao : TODAS) {
+        for (Situacao situacao : todas()) {
             if (situacao.getDescricao().equals(descricao)) {
                 return situacao;
             }
         }
-        throw new IllegalArgumentException("Situacao " + descricao.toUpperCase() +"desconhecida.");
+        throw new IllegalArgumentException("Situacao desconhecida: " + descricao);
     }
 }

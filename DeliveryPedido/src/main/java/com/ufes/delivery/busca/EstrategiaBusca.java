@@ -2,6 +2,9 @@ package com.ufes.delivery.busca;
 
 import java.util.List;
 
-public abstract class EstrategiaBusca<T> {
-    public abstract List<T> buscar(String valor, Object repositorio) throws RuntimeException;
+public interface EstrategiaBusca<T, R> {
+
+    String getRotulo();
+
+    List<T> buscar(String valor, R repositorio);
 }

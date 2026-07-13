@@ -5,7 +5,7 @@ public final class EmTransito extends EstadoPedido {
     public static final EmTransito INSTANCIA = new EmTransito();
 
     private EmTransito() {
-        todosEstadosPedido(this);
+        super("Em trânsito");
     }
 
     @Override

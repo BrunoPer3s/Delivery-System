@@ -1,6 +1,9 @@
 package com.ufes.delivery.presenter.estoque;
 
+import com.ufes.delivery.apoio.LoggerEmMemoria;
 import com.ufes.delivery.apoio.MovimentacaoEstoqueViewStub;
+import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.model.Produto;
 import com.ufes.delivery.model.Usuario;
 import com.ufes.delivery.model.perfil.Administrador;
 import com.ufes.delivery.model.perfil.Atendente;
@@ -33,6 +36,7 @@ class MovimentacaoEstoquePresenterTest {
 
     private IProdutoRepository produtoRepository;
     private SessaoService sessaoService;
+    private LoggerEmMemoria logger;
     private MovimentacaoEstoqueViewStub view;
     private MovimentacaoEstoquePresenter presenter;
 
@@ -45,8 +49,11 @@ class MovimentacaoEstoquePresenterTest {
         sessaoService = SessaoService.getInstancia();
         logarComo(Administrador.INSTANCIA);
 
+        logger = new LoggerEmMemoria();
+
         view = new MovimentacaoEstoqueViewStub();
-        presenter = new MovimentacaoEstoquePresenter(view, produtoRepository, null, sessaoService);
+        presenter = new MovimentacaoEstoquePresenter(view, produtoRepository,
+                new GerenciadorDeLogAtivo(logger), sessaoService);
     }
 
     @AfterEach
@@ -173,6 +180,82 @@ class MovimentacaoEstoquePresenterTest {
 
         assertEquals("Quantidade a movimentar deve ser diferente de zero.", view.getMensagemErro());
         assertEquals(120, estoqueDoCaderno());
+    }
+
+    @Test
+    @DisplayName("Cenário 5 - A movimentação é registrada com a data informada pelo usuário")
+    void movimentacaoERegistradaComADataInformada() {
+        selecionarCaderno();
+        String ontem = LocalDate.now().minusDays(1).format(DATA);
+        view.preencherMovimentacao(ontem, "Entrada", "30", null, "NF-12345");
+
+        presenter.onConfirmarMovimentacao();
+
+        assertNull(view.getMensagemErro());
+        assertFalse(logger.vazio());
+        assertTrue(logger.getUltimaOperacao().contains(ontem),
+                "A auditoria deve conter a data informada: " + logger.getUltimaOperacao());
+    }
+
+    @Test
+    @DisplayName("Cenário 5 - A movimentação é registrada com tipo, nota fiscal e produto")
+    void movimentacaoERegistradaComTipoENotaFiscal() {
+        selecionarCaderno();
+        view.preencherMovimentacao(hoje(), "Entrada", "30", null, "NF-12345");
+
+        presenter.onConfirmarMovimentacao();
+
+        String operacao = logger.getUltimaOperacao();
+        assertTrue(operacao.contains("Entrada"), operacao);
+        assertTrue(operacao.contains("NF-12345"), operacao);
+        assertTrue(operacao.contains("Caderno Universitário"), operacao);
+    }
+
+    @Test
+    @DisplayName("Cenário 5 - O ajuste é registrado com o motivo informado")
+    void ajusteERegistradoComMotivo() {
+        selecionarCaderno();
+        view.preencherMovimentacao(hoje(), "Ajuste de estoque", "-15", "Perda por avaria", null);
+
+        presenter.onConfirmarMovimentacao();
+
+        String operacao = logger.getUltimaOperacao();
+        assertTrue(operacao.contains("Perda por avaria"), operacao);
+    }
+
+    @Test
+    @DisplayName("O estoque é reconsultado na confirmação, e não a cópia carregada na seleção")
+    void estoqueEReconsultadoNaConfirmacao() {
+        selecionarCaderno();
+        view.preencherMovimentacao(hoje(), "Entrada", "30", null, "NF-12345");
+
+        Produto outraSessao = produtoRepository.buscarPorCodigo(CADERNO).orElseThrow();
+        outraSessao.ajustarEstoque(-100);
+        produtoRepository.salvar(outraSessao);
+        assertEquals(20, estoqueDoCaderno());
+
+        presenter.onConfirmarMovimentacao();
+
+        assertNull(view.getMensagemErro());
+        assertEquals(50, estoqueDoCaderno());
+    }
+
+    @Test
+    @DisplayName("Um ajuste negativo é bloqueado quando o estoque já caiu desde a seleção")
+    void ajusteNegativoEBloqueadoQuandoEstoqueCaiuDesdeASelecao() {
+        selecionarCaderno();
+        view.preencherMovimentacao(hoje(), "Ajuste de estoque", "-100", "Perda por avaria", null);
+
+        Produto outraSessao = produtoRepository.buscarPorCodigo(CADERNO).orElseThrow();
+        outraSessao.ajustarEstoque(-70);
+        produtoRepository.salvar(outraSessao);
+        assertEquals(50, estoqueDoCaderno());
+
+        presenter.onConfirmarMovimentacao();
+
+        assertNotNull(view.getMensagemErro());
+        assertTrue(view.getMensagemErro().contains("50"), view.getMensagemErro());
+        assertEquals(50, estoqueDoCaderno());
     }
 
     @Test

@@ -5,7 +5,7 @@ public final class Administrador extends Perfil {
     public static final Administrador INSTANCIA = new Administrador();
 
     private Administrador() {
-        todosPerfis(this);
+        super("Administrador");
     }
 
     @Override

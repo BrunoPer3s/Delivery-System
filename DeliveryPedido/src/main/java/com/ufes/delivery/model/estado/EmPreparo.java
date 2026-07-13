@@ -5,7 +5,7 @@ public final class EmPreparo extends EstadoPedido {
     public static final EmPreparo INSTANCIA = new EmPreparo();
 
     private EmPreparo() {
-        todosEstadosPedido(this);
+        super("Em preparo");
     }
 
     @Override
