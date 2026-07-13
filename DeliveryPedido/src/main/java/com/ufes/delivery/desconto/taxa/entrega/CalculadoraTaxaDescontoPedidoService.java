@@ -1,6 +1,8 @@
 package com.ufes.delivery.desconto.taxa.entrega;
 
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.delivery.log.ResultadoOperacao;
+import com.ufes.delivery.util.UsuarioLogadoService;
 import com.ufes.delivery.model.CupomDescontoEntrega;
 import com.ufes.delivery.model.Pedido;
 import com.ufes.log.ILogger;
@@ -42,7 +44,15 @@ public class CalculadoraTaxaDescontoPedidoService {
             }
         }
         if (logger != null) {
-            logger.registrar(MensagemLogFactory.criar(pedido, "Aplicação de cupom de desconto na taxa de entrega", "calcularDesconto"));
+            double descontoTotal = pedido.getTotalDescontosTaxaEntrega();
+            logger.registrar(MensagemLogFactory.operacao("Cálculo de desconto na taxa de entrega")
+                    .pedido(pedido)
+                    .recurso("Taxa de entrega do pedido " + pedido.getCodigo())
+                    .resultado(ResultadoOperacao.SUCESSO)
+                    .justificativa(descontoTotal > 0
+                            ? String.format("Desconto aplicado: R$ %.2f", descontoTotal)
+                            : "Nenhum desconto aplicável")
+                    .paraUsuario(UsuarioLogadoService.getNomeUsuario()));
         }
     }
 }

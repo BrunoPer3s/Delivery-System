@@ -3,7 +3,9 @@ package com.ufes.delivery.presenter.pedido;
 import com.ufes.delivery.desconto.pedido.AplicadorCupomPedidoService;
 import com.ufes.delivery.desconto.taxa.entrega.CalculadoraTaxaDescontoPedidoService;
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.*;
 import com.ufes.delivery.model.estado.AguardandoEntrega;
 import com.ufes.delivery.presenter.cliente.CadastroClientePresenter;
@@ -280,7 +282,8 @@ public class PedidoPresenter {
         String codigoCupom = view.getCodigoCupom();
         if (codigoCupom == null || codigoCupom.trim().isEmpty()) {
             view.exibirMensagemErro("Informe o código do cupom.");
-            registrarAuditoria("Cupom recusado - código não informado");
+            registrarAuditoriaDeCupom(ResultadoOperacao.REJEITADO, "",
+                    "Código do cupom não informado");
             return;
         }
 
@@ -296,7 +299,7 @@ public class PedidoPresenter {
             aplicador.aplicarCupom(pedido, codigo, LocalDateTime.now());
         } catch (IllegalArgumentException | IllegalStateException e) {
             view.exibirMensagemErro(e.getMessage());
-            registrarAuditoria("Cupom recusado: " + codigo + " - " + e.getMessage());
+            registrarAuditoriaDeCupom(ResultadoOperacao.REJEITADO, codigo, e.getMessage());
             return;
         }
 
@@ -346,8 +349,9 @@ public class PedidoPresenter {
             if (produtoAtual.isEmpty()) {
                 view.exibirMensagemErro("Produto de código " + codigoProduto
                         + " não está mais cadastrado. Remova o item e tente novamente.");
-                registrarAuditoria("Pagamento bloqueado - produto inexistente - Pedido #"
-                        + pedido.getCodigo() + " - Produto: " + codigoProduto);
+                registrarAuditoriaDePedido("Tentativa de pagamento",
+                        "Produto " + codigoProduto, ResultadoOperacao.REJEITADO,
+                        "Produto não está mais cadastrado");
                 return;
             }
 
@@ -356,10 +360,11 @@ public class PedidoPresenter {
                 view.exibirMensagemErro("Estoque insuficiente para \"" + produto.getNome()
                         + "\". Solicitado: " + solicitado
                         + ", disponível: " + produto.getEstoqueAtual() + ".");
-                registrarAuditoria("Pagamento bloqueado por estoque insuficiente - Pedido #"
-                        + pedido.getCodigo() + " - Produto: " + produto.getNome()
-                        + " - Solicitado: " + solicitado
-                        + " - Disponível: " + produto.getEstoqueAtual());
+                registrarAuditoriaDePedido("Tentativa de pagamento",
+                        "Produto " + produto.getCodigo() + " - " + produto.getNome(),
+                        ResultadoOperacao.REJEITADO,
+                        "Estoque insuficiente - solicitado: " + solicitado
+                                + ", disponível: " + produto.getEstoqueAtual());
                 return;
             }
             produtosDoPedido.add(produto);
@@ -397,23 +402,28 @@ public class PedidoPresenter {
             } catch (RuntimeException e) {
                 view.exibirMensagemErro(
                         "Falha ao confirmar o pagamento. Nenhuma alteração foi persistida.");
-                registrarAuditoria("Falha na confirmação do pagamento - Pedido #"
-                        + pedido.getCodigo() + " - " + e.getMessage());
+                registrarAuditoriaDePedido("Confirmação do pagamento", "Pedido",
+                        ResultadoOperacao.FALHA,
+                        "Nenhuma alteração foi persistida: " + e.getMessage());
                 return;
             }
 
             for (Produto produto : produtosDoPedido) {
-                registrarAuditoria("Baixa de estoque - Pedido #" + pedido.getCodigo()
-                        + " - Produto: " + produto.getCodigo() + " - " + produto.getNome()
-                        + " - Qtd: " + quantidadeSolicitada.get(produto.getCodigo())
-                        + " - Estoque resultante: " + produto.getEstoqueAtual());
+                registrarAuditoriaDePedido("Baixa de estoque",
+                        "Produto " + produto.getCodigo() + " - " + produto.getNome(),
+                        ResultadoOperacao.SUCESSO,
+                        "Quantidade: " + quantidadeSolicitada.get(produto.getCodigo())
+                                + " | Estoque resultante: " + produto.getEstoqueAtual());
             }
 
-            registrarAuditoria("Pedido #" + pedido.getCodigo() + " APROVADO via "
-                    + resultado.getFormaPagamento() + " - Cliente: "
-                    + clienteSelecionado.getNome() + " - Total: " + totalFormatado);
-            registrarAuditoria("Transição de estado - Pedido #" + pedido.getCodigo()
-                    + " para " + AguardandoEntrega.INSTANCIA.getNome());
+            registrarAuditoriaDePedido("Resultado do pagamento",
+                    "Pagamento via " + resultado.getFormaPagamento(),
+                    ResultadoOperacao.SUCESSO,
+                    "Aprovado - transação " + resultado.getIdentificadorTransacao()
+                            + " | Valor pago: " + totalFormatado);
+            registrarAuditoriaDePedido("Transição de estado do pedido", "Pedido",
+                    ResultadoOperacao.SUCESSO,
+                    "Novo estado: " + AguardandoEntrega.INSTANCIA.getNome());
 
             new ResultadoPagamentoView(
                     resultado, pedido.getCodigo(),
@@ -423,9 +433,10 @@ public class PedidoPresenter {
 
             view.fechar();
         } else {
-            registrarAuditoria("Pedido #" + pedido.getCodigo() + " REPROVADO via "
-                    + resultado.getFormaPagamento() + " - Cliente: "
-                    + clienteSelecionado.getNome() + " - Total: " + totalFormatado);
+            registrarAuditoriaDePedido("Resultado do pagamento",
+                    "Pagamento via " + resultado.getFormaPagamento(),
+                    ResultadoOperacao.REJEITADO,
+                    "Reprovado - estoque e situação do pedido preservados");
 
             new ResultadoPagamentoView(
                     resultado, pedido.getCodigo(),
@@ -538,15 +549,41 @@ public class PedidoPresenter {
 
 
 
-    private void registrarAuditoria(String operacao) {
-        if (logger != null) {
-            try {
-                String usuario = sessaoService.getNomeUsuarioLogado();
-                logger.registrar(MensagemLogFactory.criarParaOperacao(
-                        usuario != null ? usuario : "sistema", operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+    private void registrarAuditoriaDePedido(String operacao, String recurso,
+                                             ResultadoOperacao resultado, String justificativa) {
+        if (logger == null) {
+            return;
+        }
+        try {
+            String usuario = sessaoService.getNomeUsuarioLogado();
+            logger.registrar(MensagemLogFactory.operacao(operacao)
+                    .pedido(pedido.getCodigo(), clienteSelecionado.getNome())
+                    .recurso(recurso)
+                    .resultado(resultado)
+                    .justificativa(justificativa)
+                    .paraUsuario(usuario != null ? usuario : "sistema"));
+        } catch (LogIndisponivelException e) {
+            view.exibirMensagemErro("O registro de auditoria falhou.");
+        }
+    }
+
+    private void registrarAuditoriaDeCupom(ResultadoOperacao resultado, String codigo,
+                                            String justificativa) {
+        if (logger == null) {
+            return;
+        }
+        try {
+            String usuario = sessaoService.getNomeUsuarioLogado();
+            MensagemLogFactory.Builder builder = MensagemLogFactory.operacao("Aplicação de cupom")
+                    .recurso(codigo.isEmpty() ? "Cupom" : "Cupom " + codigo)
+                    .resultado(resultado)
+                    .justificativa(justificativa);
+            if (pedido != null && clienteSelecionado != null) {
+                builder.pedido(pedido.getCodigo(), clienteSelecionado.getNome());
             }
+            logger.registrar(builder.paraUsuario(usuario != null ? usuario : "sistema"));
+        } catch (LogIndisponivelException e) {
+            view.exibirMensagemErro("O registro de auditoria falhou.");
         }
     }
 }

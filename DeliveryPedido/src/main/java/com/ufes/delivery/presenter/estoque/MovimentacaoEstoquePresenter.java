@@ -1,7 +1,9 @@
 package com.ufes.delivery.presenter.estoque;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.Produto;
 import com.ufes.delivery.repository.produto.IProdutoRepository;
 import com.ufes.delivery.service.SessaoService;
@@ -119,7 +121,8 @@ public class MovimentacaoEstoquePresenter {
     public void onConfirmarMovimentacao() {
         if (!sessaoService.isAdministrador()) {
             view.exibirMensagemErro("Movimentação de estoque é restrita ao Administrador.");
-            registrarAuditoria("Acesso negado - tentativa de movimentação de estoque sem perfil Administrador");
+            registrarAuditoria("Movimentação de estoque", "Estoque", ResultadoOperacao.REJEITADO,
+                    "Acesso negado - perfil sem permissão administrativa");
             return;
         }
 
@@ -218,17 +221,19 @@ public class MovimentacaoEstoquePresenter {
             produto.ajustarEstoque(ajusteEfetivo);
             produtoRepository.salvar(produto);
 
-            String descricao = String.format(
-                "Movimentação de estoque: %s | Data: %s | Produto: %d - %s | Qtd: %d | %s→%d%s",
-                tipo,
-                dataMovimentacao.format(DATE_FORMATTER),
-                produto.getCodigo(),
-                produto.getNome(),
-                ajusteEfetivo,
-                isAjuste ? "Motivo: " + motivo.trim() + " | " : "",
-                estoqueResultante,
-                !isAjuste ? " | NF: " + notaFiscal.trim() : "");
-            registrarAuditoria(descricao);
+            String justificativa = isAjuste
+                    ? "Motivo: " + motivo.trim()
+                    : "Nota fiscal: " + notaFiscal.trim();
+            registrarAuditoria(
+                    "Movimentação de estoque - " + tipo,
+                    "Produto " + produto.getCodigo() + " - " + produto.getNome(),
+                    ResultadoOperacao.SUCESSO,
+                    String.format("Data: %s | Quantidade: %d | Estoque: %d -> %d | %s",
+                            dataMovimentacao.format(DATE_FORMATTER),
+                            ajusteEfetivo,
+                            estoqueResultante - ajusteEfetivo,
+                            estoqueResultante,
+                            justificativa));
 
             view.exibirMensagemSucesso(
                 "Movimentação confirmada com sucesso!\n" +
@@ -263,14 +268,19 @@ public class MovimentacaoEstoquePresenter {
         return dados;
     }
 
-    private void registrarAuditoria(String operacao) {
+    private void registrarAuditoria(String operacao, String recurso,
+                                     ResultadoOperacao resultado, String justificativa) {
         if (logger != null) {
             try {
                 String usuario = sessaoService.getNomeUsuarioLogado();
-                logger.registrar(MensagemLogFactory.criarParaOperacao(
-                    usuario != null ? usuario : "sistema", operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+                logger.registrar(MensagemLogFactory.operacao(operacao)
+                        .recurso(recurso)
+                        .resultado(resultado)
+                        .justificativa(justificativa)
+                        .paraUsuario(usuario != null ? usuario : "sistema"));
+            } catch (LogIndisponivelException e) {
+                view.exibirMensagemErro(
+                        "A operação foi concluída, mas o registro de auditoria falhou.");
             }
         }
     }

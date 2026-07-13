@@ -1,7 +1,9 @@
 package com.ufes.delivery.presenter.painel;
 
 import com.ufes.delivery.log.GerenciadorDeLogAtivo;
+import com.ufes.delivery.log.ResultadoOperacao;
 import com.ufes.delivery.log.MensagemLogFactory;
+import com.ufes.log.LogIndisponivelException;
 import com.ufes.delivery.model.Sessao;
 import com.ufes.delivery.model.estado.*;
 import com.ufes.delivery.presenter.cliente.BuscaClientePresenter;
@@ -197,8 +199,9 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
         if (!sessaoService.isAdministrador()) {
             view.exibirMensagemErro(
                     "Gestão de usuários é restrita ao perfil Administrador.");
-            registrarAuditoria(
-                    "Acesso negado - tentativa de abrir gestão de usuários sem perfil Administrador");
+            registrarAuditoria("Abertura da gestão de usuários", "Tela de usuários",
+                    ResultadoOperacao.REJEITADO,
+                    "Acesso negado - perfil sem permissão administrativa");
             return;
         }
 
@@ -209,14 +212,18 @@ public class PainelPrincipalPresenter implements RepositorioObserver {
         gestaoView.exibir();
     }
 
-    private void registrarAuditoria(String operacao) {
+    private void registrarAuditoria(String operacao, String recurso,
+                                     ResultadoOperacao resultado, String justificativa) {
         if (logger != null) {
             try {
                 String usuario = sessaoService.getNomeUsuarioLogado();
-                logger.registrar(MensagemLogFactory.criarParaOperacao(
-                        usuario != null ? usuario : "sistema", operacao));
-            } catch (Exception e) {
-                System.err.println("Falha ao registrar auditoria: " + e.getMessage());
+                logger.registrar(MensagemLogFactory.operacao(operacao)
+                        .recurso(recurso)
+                        .resultado(resultado)
+                        .justificativa(justificativa)
+                        .paraUsuario(usuario != null ? usuario : "sistema"));
+            } catch (LogIndisponivelException e) {
+                view.exibirMensagemErro("O registro de auditoria falhou.");
             }
         }
     }

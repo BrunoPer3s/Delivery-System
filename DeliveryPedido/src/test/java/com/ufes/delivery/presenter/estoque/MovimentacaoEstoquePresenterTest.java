@@ -193,8 +193,8 @@ class MovimentacaoEstoquePresenterTest {
 
         assertNull(view.getMensagemErro());
         assertFalse(logger.vazio());
-        assertTrue(logger.getUltimaOperacao().contains(ontem),
-                "A auditoria deve conter a data informada: " + logger.getUltimaOperacao());
+        assertTrue(logger.getUltimaJustificativa().contains(ontem),
+                "A auditoria deve conter a data informada: " + logger.getUltimaJustificativa());
     }
 
     @Test
@@ -205,10 +205,11 @@ class MovimentacaoEstoquePresenterTest {
 
         presenter.onConfirmarMovimentacao();
 
-        String operacao = logger.getUltimaOperacao();
-        assertTrue(operacao.contains("Entrada"), operacao);
-        assertTrue(operacao.contains("NF-12345"), operacao);
-        assertTrue(operacao.contains("Caderno Universitário"), operacao);
+        assertTrue(logger.getUltimaOperacao().contains("Entrada"), logger.getUltimaOperacao());
+        assertTrue(logger.getUltimoRecurso().contains("Caderno Universitário"),
+                logger.getUltimoRecurso());
+        assertTrue(logger.getUltimaJustificativa().contains("NF-12345"),
+                logger.getUltimaJustificativa());
     }
 
     @Test
@@ -219,8 +220,8 @@ class MovimentacaoEstoquePresenterTest {
 
         presenter.onConfirmarMovimentacao();
 
-        String operacao = logger.getUltimaOperacao();
-        assertTrue(operacao.contains("Perda por avaria"), operacao);
+        assertTrue(logger.getUltimaJustificativa().contains("Perda por avaria"),
+                logger.getUltimaJustificativa());
     }
 
     @Test

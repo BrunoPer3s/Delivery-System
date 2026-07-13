@@ -17,7 +17,7 @@ import com.ufes.delivery.service.AutenticacaoService;
 import com.ufes.delivery.service.SessaoService;
 import com.ufes.delivery.service.SimuladorCicloPedidoService;
 import com.ufes.delivery.view.login.LoginView;
-import com.ufes.log.JsonlLogger;
+import com.ufes.delivery.log.ConfiguracaoAuditoria;
 
 import javax.swing.*;
 
@@ -31,7 +31,8 @@ public class DeliveryApplication {
         }
 
         SwingUtilities.invokeLater(() -> {
-            GerenciadorDeLogAtivo logger = new GerenciadorDeLogAtivo(new JsonlLogger());
+            GerenciadorDeLogAtivo logger =
+                    new GerenciadorDeLogAtivo(ConfiguracaoAuditoria.loggerConfigurado());
 
             BancoDados banco = new BancoDados();
             banco.inicializar();
