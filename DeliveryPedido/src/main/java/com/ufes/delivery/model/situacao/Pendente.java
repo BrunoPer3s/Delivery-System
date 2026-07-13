@@ -5,7 +5,7 @@ public final class Pendente extends Situacao {
     public static final Pendente INSTANCIA = new Pendente();
 
     private Pendente() {
-        todasSituacoes(INSTANCIA);
+        todasSituacoes(this);
     }
 
     @Override

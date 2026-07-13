@@ -4,7 +4,9 @@ public final class Entregue extends EstadoPedido {
 
     public static final Entregue INSTANCIA = new Entregue();
 
-    private Entregue() {}
+    private Entregue() {
+        todosEstadosPedido(this);
+    }
 
     @Override
     public EstadoPedido avancar() {

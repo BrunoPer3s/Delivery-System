@@ -4,7 +4,9 @@ public final class EmPreparo extends EstadoPedido {
 
     public static final EmPreparo INSTANCIA = new EmPreparo();
 
-    private EmPreparo() {}
+    private EmPreparo() {
+        todosEstadosPedido(this);
+    }
 
     @Override
     public EstadoPedido avancar() {

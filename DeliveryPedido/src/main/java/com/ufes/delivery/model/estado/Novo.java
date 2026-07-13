@@ -4,7 +4,9 @@ public final class Novo extends EstadoPedido {
 
     public static final Novo INSTANCIA = new Novo();
 
-    private Novo() {}
+    private Novo() {
+        todosEstadosPedido(this);
+    }
 
     @Override
     public EstadoPedido avancar() {

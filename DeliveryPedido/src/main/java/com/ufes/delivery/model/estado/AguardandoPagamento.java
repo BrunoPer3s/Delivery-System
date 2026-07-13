@@ -4,7 +4,9 @@ public final class AguardandoPagamento extends EstadoPedido {
 
     public static final AguardandoPagamento INSTANCIA = new AguardandoPagamento();
 
-    private AguardandoPagamento() {}
+    private AguardandoPagamento() {
+        todosEstadosPedido(this);
+    }
 
     @Override
     public EstadoPedido avancar() {

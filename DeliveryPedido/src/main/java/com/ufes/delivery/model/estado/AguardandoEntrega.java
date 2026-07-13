@@ -4,7 +4,9 @@ public final class AguardandoEntrega extends EstadoPedido {
 
     public static final AguardandoEntrega INSTANCIA = new AguardandoEntrega();
 
-    private AguardandoEntrega() {}
+    private AguardandoEntrega() {
+        todosEstadosPedido(this);
+    }
 
     @Override
     public EstadoPedido avancar() {

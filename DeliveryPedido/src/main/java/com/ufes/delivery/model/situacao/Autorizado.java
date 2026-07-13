@@ -5,7 +5,7 @@ public final class Autorizado extends Situacao {
     public static final Autorizado INSTANCIA = new Autorizado();
 
     private Autorizado() {
-        todasSituacoes(INSTANCIA);
+        todasSituacoes(this);
     }
 
     @Override
