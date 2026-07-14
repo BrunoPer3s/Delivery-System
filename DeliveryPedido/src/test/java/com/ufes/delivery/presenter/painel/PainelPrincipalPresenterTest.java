@@ -18,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -66,6 +67,19 @@ class PainelPrincipalPresenterTest {
         logarComo(Administrador.INSTANCIA);
         new PainelPrincipalPresenter(view, null, null, null, null,
                 pedidoRepository, null, sessaoService, null);
+    }
+
+    @Test
+    @DisplayName("Cenário 1 - US01e Cenário 3 US04 - A barra de status apresenta usuário, login e tipo da sessão")
+    void barraDeStatusApresentaDadosDaSessao() {
+        abrirPainel();
+        LocalDateTime horaDoLogin = sessaoService.getSessaoAtual().getDataHoraLogin();
+        String horaFormatadaEsperada = horaDoLogin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+
+        assertEquals(hoje(),view.getDataOperacao());
+        assertEquals("usuario01", view.getNomeUsuario());
+        assertEquals("Administrador", view.getTipoPerfil());
+        assertEquals(horaFormatadaEsperada, view.getLoginFormatado());
     }
 
     @Test
@@ -146,16 +160,6 @@ class PainelPrincipalPresenterTest {
 
         assertEquals(0, view.getEntreguesHoje());
         assertEquals(0, view.getPedidosDia());
-    }
-
-    @Test
-    @DisplayName("Cenário 3 - A barra de status apresenta usuário, login e tipo da sessão")
-    void barraDeStatusApresentaDadosDaSessao() {
-        abrirPainel();
-
-        assertEquals("usuario01", view.getNomeUsuario());
-        assertEquals("Administrador", view.getTipoPerfil());
-        assertTrue(view.getLoginFormatado().matches("\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}"));
     }
 
     @Test

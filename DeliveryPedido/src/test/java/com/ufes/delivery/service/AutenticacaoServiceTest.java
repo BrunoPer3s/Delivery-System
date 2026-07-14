@@ -31,6 +31,7 @@ class AutenticacaoServiceTest {
         autenticacaoService = new AutenticacaoService(usuarioRepository, null);
     }
 
+    //Teste de visualização da barra de status de informações no painel transferida para PainelPrincipalPresenterTest
     @Test
     @DisplayName("Cenário 1 - Autenticar usuário administrador")
     void autenticaAdministradorAutorizado() {
